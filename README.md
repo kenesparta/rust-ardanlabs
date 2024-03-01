@@ -1,2 +1,2 @@
-# rust-ardanlabs
+# Rust Ardanlabs Course
 Rust Course for ardan labs
