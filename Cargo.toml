@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "basics/authentication",
+    "basics/variables",
+]
+
+resolver = "2"
