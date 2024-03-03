@@ -45,14 +45,8 @@ fn great_borrow_mut(s: &mut String) {
 }
 
 fn double_or_nothing(n: i32) -> i32 {
-    if n>0 {
-        n*2;
+    if n > 0 {
+        n * 2;
     }
     0
-}
-
-fn read_line() -> String {
-    let mut input = String::new();
-    std::io::stdin().read_line(&mut input);
-    input.trim().to_string()
 }

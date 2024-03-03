@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "basics/authentication",
+    "basics/login",
     "basics/variables",
 ]
 

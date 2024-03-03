@@ -1,13 +1,22 @@
-pub fn greet_user(name: &str) -> String {
-    format!("Hello {name}")
-}
+pub mod greet;
+pub mod login;
+pub mod read;
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::greet::greet_user;
+    use crate::login::login;
 
     #[test]
     fn test_greet_user() {
         assert_eq!("Hello Herbert", greet_user("Herbert"))
+    }
+
+    #[test]
+    fn test_login() {
+        assert!(login("admin", "admin"));
+        assert!(login("AdMiN", "admin"));
+        assert!(!login("admin", "pass"));
+        assert!(!login("admin", ""));
     }
 }
