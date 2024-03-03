@@ -5,7 +5,7 @@ pub mod read;
 #[cfg(test)]
 mod tests {
     use crate::greet::greet_user;
-    use crate::login::login;
+    use crate::login::{login, LoginAction, LoginRole};
 
     #[test]
     fn test_greet_user() {
@@ -14,9 +14,10 @@ mod tests {
 
     #[test]
     fn test_login() {
-        assert!(login("admin", "admin"));
-        assert!(login("AdMiN", "admin"));
-        assert!(!login("admin", "pass"));
-        assert!(!login("admin", ""));
+        assert_eq!(login("admin", "admin"), LoginAction::Granted(LoginRole::Admin));
+        assert_eq!(login("bob", "pass"), LoginAction::Granted(LoginRole::User));
+        assert_eq!(login("AdMiN", "admin"), LoginAction::Granted(LoginRole::Admin));
+        assert_eq!(login("admin", "pass"), LoginAction::Denied);
+        assert_eq!(login("admin", ""), LoginAction::Denied);
     }
 }
