@@ -1,5 +1,7 @@
-use crate::login::{login, LoginRole};
+use crate::login::LoginRole;
+use std::collections::HashMap;
 
+#[derive(Debug, Clone)]
 pub struct User {
     pub username: String,
     pub passwd: String,
@@ -21,6 +23,16 @@ pub fn get_users() -> Vec<User> {
         User::new("admin", "admin", LoginRole::Admin),
         User::new("bob", "pass", LoginRole::User),
     ]
+}
+
+pub fn get_users_map() -> HashMap<String, User> {
+    let mut users_map = HashMap::new();
+    users_map.insert(
+        "admin".to_string(),
+        User::new("admin", "admin", LoginRole::Admin),
+    );
+    users_map.insert("bob".to_string(), User::new("bob", "pass", LoginRole::User));
+    users_map
 }
 
 fn test_vec() -> Vec<String> {

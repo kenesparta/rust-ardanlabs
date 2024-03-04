@@ -1,4 +1,4 @@
-use crate::user::get_users;
+use crate::user::{get_users, get_users_map};
 
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum LoginRole {
@@ -26,4 +26,16 @@ pub fn login(username: &str, passwd: &str) -> Option<LoginAction> {
             }
             None
         })
+}
+
+pub fn login_map(username: &str, passwd: &str) -> Option<LoginAction> {
+    let users = get_users_map();
+    let username = username.to_lowercase();
+    if let Some(user) = users.get(&username) {
+        if user.passwd == passwd {
+            return Some(LoginAction::Granted(user.role.clone()));
+        }
+        return Some(LoginAction::Denied);
+    }
+    None
 }
