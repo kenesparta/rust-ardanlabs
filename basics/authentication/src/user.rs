@@ -1,4 +1,4 @@
-use crate::login::LoginRole;
+use crate::login::{login, LoginRole};
 
 pub struct User {
     pub username: String,
@@ -16,9 +16,18 @@ impl User {
     }
 }
 
-pub fn get_users() -> [User; 2] {
-    [
+pub fn get_users() -> Vec<User> {
+    vec![
         User::new("admin", "admin", LoginRole::Admin),
         User::new("bob", "pass", LoginRole::User),
     ]
+}
+
+fn test_vec() -> Vec<String> {
+    let users: Vec<String> = get_users()
+        .into_iter()
+        .filter(|u| u.role == LoginRole::Admin)
+        .map(|u| u.username)
+        .collect();
+    users
 }
