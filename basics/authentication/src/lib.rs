@@ -1,6 +1,7 @@
 pub mod greet;
 pub mod login;
 pub mod read;
+mod user;
 
 #[cfg(test)]
 mod tests {
@@ -14,10 +15,20 @@ mod tests {
 
     #[test]
     fn test_login() {
-        assert_eq!(login("admin", "admin"), LoginAction::Granted(LoginRole::Admin));
-        assert_eq!(login("bob", "pass"), LoginAction::Granted(LoginRole::User));
-        assert_eq!(login("AdMiN", "admin"), LoginAction::Granted(LoginRole::Admin));
-        assert_eq!(login("admin", "pass"), LoginAction::Denied);
-        assert_eq!(login("admin", ""), LoginAction::Denied);
+        assert_eq!(
+            login("admin", "admin"),
+            Some(LoginAction::Granted(LoginRole::Admin))
+        );
+        assert_eq!(
+            login("bob", "pass"),
+            Some(LoginAction::Granted(LoginRole::User))
+        );
+        assert_eq!(
+            login("AdMiN", "admin"),
+            Some(LoginAction::Granted(LoginRole::Admin))
+        );
+        assert_eq!(login("admin", "pass"), Some(LoginAction::Denied));
+        assert_eq!(login("admin", ""), Some(LoginAction::Denied));
+        assert_eq!(login("ken", "pass"), None);
     }
 }
