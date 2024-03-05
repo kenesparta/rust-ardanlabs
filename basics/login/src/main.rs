@@ -1,5 +1,5 @@
 use authentication::greet::greet_user;
-use authentication::login::{login, LoginAction, LoginRole};
+use authentication::login::{login, login_map_file, LoginAction, LoginRole};
 use authentication::read::read_line;
 
 fn main() {
@@ -11,7 +11,7 @@ fn main() {
         println!("Enter your passwd: ");
         let passwd = read_line();
 
-        match login(&username, &passwd) {
+        match login_map_file(&username, &passwd) {
             Some(LoginAction::Granted(LoginRole::Admin)) => {
                 print!("Welcome Admin: {username}!\n");
                 break;
@@ -26,6 +26,7 @@ fn main() {
             }
             None => {
                 print!("New user system\n");
+                break;
             }
         }
 

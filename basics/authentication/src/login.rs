@@ -1,6 +1,7 @@
-use crate::user::{get_users, get_users_map};
+use serde::{Deserialize, Serialize};
+use crate::user::{get_users, get_users_from_file, get_users_map};
 
-#[derive(PartialEq, Debug, Clone, Copy)]
+#[derive(PartialEq, Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum LoginRole {
     Admin,
     User,
@@ -30,6 +31,18 @@ pub fn login(username: &str, passwd: &str) -> Option<LoginAction> {
 
 pub fn login_map(username: &str, passwd: &str) -> Option<LoginAction> {
     let users = get_users_map();
+    let username = username.to_lowercase();
+    if let Some(user) = users.get(&username) {
+        if user.passwd == passwd {
+            return Some(LoginAction::Granted(user.role.clone()));
+        }
+        return Some(LoginAction::Denied);
+    }
+    None
+}
+
+pub fn login_map_file(username: &str, passwd: &str) -> Option<LoginAction> {
+    let users = get_users_from_file();
     let username = username.to_lowercase();
     if let Some(user) = users.get(&username) {
         if user.passwd == passwd {

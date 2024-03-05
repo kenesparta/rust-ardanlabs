@@ -1,7 +1,9 @@
 use crate::login::LoginRole;
 use std::collections::HashMap;
+use std::path::Path;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct User {
     pub username: String,
     pub passwd: String,
@@ -16,6 +18,19 @@ impl User {
             role,
         }
     }
+}
+
+pub fn get_users_from_file() -> HashMap<String, User> {
+    let users_path = Path::new("users.json");
+    if users_path.exists() {
+        let users_json = std::fs::read_to_string(users_path).unwrap();
+        let users: HashMap<String, User> = serde_json::from_str(&users_json).unwrap();
+        users
+    }
+    let users = get_users_map();
+    let users_json = serde_json::to_string(&users).unwrap();
+    std::fs::write(users_path, users_json).unwrap();
+    users
 }
 
 pub fn get_users() -> Vec<User> {
