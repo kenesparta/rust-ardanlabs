@@ -2,6 +2,14 @@ use crate::login::LoginRole;
 use std::collections::HashMap;
 use std::path::Path;
 use serde::{Deserialize, Serialize};
+use sha2::Digest;
+
+pub fn hash_passwd(passwd: &str) -> String {
+    use sha2::Digest;
+    let mut hasher = sha2::Sha256::new();
+    hasher.update(passwd);
+    format!("{:X}", hasher.finalize())
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct User {
@@ -14,7 +22,7 @@ impl User {
     pub fn new(username: &str, passwd: &str, role: LoginRole) -> User {
         Self {
             username: username.to_lowercase(),
-            passwd: passwd.to_string(),
+            passwd: hash_passwd(passwd),
             role,
         }
     }
@@ -25,7 +33,7 @@ pub fn get_users_from_file() -> HashMap<String, User> {
     if users_path.exists() {
         let users_json = std::fs::read_to_string(users_path).unwrap();
         let users: HashMap<String, User> = serde_json::from_str(&users_json).unwrap();
-        users
+        return users;
     }
     let users = get_users_map();
     let users_json = serde_json::to_string(&users).unwrap();

@@ -4,4 +4,5 @@ members = [
     "basics/authentication",
     "basics/login",
     "basics/variables",
+    "projects/cli-app",
 ]

@@ -1,0 +1,8 @@
+[package]
+name = "cli-app"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+authentication = { path = "../../basics/authentication" }
+clap = { version = "4.3", features = ["derive"] }
