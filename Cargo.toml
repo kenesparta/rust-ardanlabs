@@ -5,4 +5,5 @@ members = [
     "basics/login",
     "basics/variables",
     "projects/cli-app",
+    "async-mt"
 ]

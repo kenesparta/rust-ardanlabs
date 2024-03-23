@@ -1,8 +1,8 @@
 use crate::login::LoginRole;
-use std::collections::HashMap;
-use std::path::Path;
 use serde::{Deserialize, Serialize};
 use sha2::Digest;
+use std::collections::HashMap;
+use std::path::Path;
 
 pub fn hash_passwd(passwd: &str) -> String {
     use sha2::Digest;

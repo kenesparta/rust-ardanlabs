@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::user::{get_users, get_users_from_file, get_users_map, hash_passwd};
+use serde::{Deserialize, Serialize};
 
 #[derive(PartialEq, Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum LoginRole {
