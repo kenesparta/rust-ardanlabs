@@ -1,7 +1,7 @@
 pub mod greet;
 pub mod login;
 pub mod read;
-mod user;
+pub mod user;
 
 #[cfg(test)]
 mod tests {

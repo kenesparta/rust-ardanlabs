@@ -58,6 +58,12 @@ pub fn get_users_map() -> HashMap<String, User> {
     users_map
 }
 
+pub fn save_users(users: HashMap<String, User>) {
+    let users_path = Path::new("users.json");
+    let users_json = serde_json::to_string(&users).unwrap();
+    std::fs::write(users_path, users_json).unwrap();
+}
+
 fn test_vec() -> Vec<String> {
     let users: Vec<String> = get_users()
         .into_iter()

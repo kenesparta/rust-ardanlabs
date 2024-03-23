@@ -18,4 +18,4 @@ Cargo.lock
 
 /target
 .idea
-users.json
+**/users.json

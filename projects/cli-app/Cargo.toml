@@ -5,4 +5,5 @@ edition = "2021"
 
 [dependencies]
 authentication = { path = "../../basics/authentication" }
+login = { path = "../../basics/login" }
 clap = { version = "4.3", features = ["derive"] }
