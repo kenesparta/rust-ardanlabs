@@ -93,3 +93,53 @@ fn main() {
     println!("Sum: {total_sum}")
 }
 ```
+
+## Shared Data with atomics
+A counter using unsafe, without atomics
+```rust
+// Creating a global variable
+static mut COUNTER: i32 = 0;
+
+fn main() {
+    let mut handles = Vec::new();
+    for _ in 0..1000 {
+        let handle = thread::spawn(|| {
+            for _ in 0..1100 {
+                unsafe {
+                    COUNTER += 1;
+                }
+            }
+        });
+        handles.push(handle)
+    }
+
+    handles.into_iter().for_each(|h| h.join().unwrap());
+    unsafe { println!("{COUNTER}") }
+}
+
+```
+
+With `std::sync::atomic`:
+```rust
+use std::sync::atomic::AtomicI32;
+use std::sync::atomic::Ordering::Relaxed;
+use std::thread;
+
+// Creating a global variable
+static COUNTER: AtomicI32 = AtomicI32::new(0);
+
+fn main() {
+    let mut handles = Vec::new();
+    for _ in 0..1000 {
+        let handle = thread::spawn(|| {
+            for _ in 0..1100 {
+                COUNTER.fetch_add(1, Relaxed);
+            }
+        });
+        handles.push(handle)
+    }
+
+    handles.into_iter().for_each(|h| h.join().unwrap());
+    println!("{}", COUNTER.load(Relaxed));
+}
+```

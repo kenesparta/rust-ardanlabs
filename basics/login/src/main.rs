@@ -2,6 +2,9 @@ use authentication::greet::greet_user;
 use authentication::login::{login, login_map_file, LoginAction, LoginRole};
 use authentication::read::read_line;
 
+// TODO
+// Security Enhancements: Although not directly shown in this snippet, consider adding mechanisms
+// like delay on failed login attempts to mitigate brute force attacks.
 fn main() {
     println!("{}", greet_user("Ken"));
     let mut tries = 0;
