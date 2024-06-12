@@ -36,3 +36,42 @@ fn main() {
 }
 
 ```
+
+# Deadlocks, panics and Poisoning
+```rust
+use std::sync::Mutex;
+
+static MY_SHARED: Mutex<u32> = Mutex::new(3);
+
+fn main() {
+    let lock = MY_SHARED.lock().unwrap();
+
+    if let Ok(_lock) = MY_SHARED.try_lock() {
+        print!("Got the lock");
+    } else {
+        print!("No Lock");
+    }
+}
+```
+
+```rust
+use std::sync::Mutex;
+use std::thread;
+
+static MY_SHARED: Mutex<u32> = Mutex::new(3);
+
+fn poisoner() {
+    let mut lock = MY_SHARED.lock().unwrap();
+    *lock += 1;
+    panic!("The poisoner strikes!")
+}
+
+fn main() {
+    let handle = thread::spawn(poisoner);
+    println!("trying to return from the thread");
+    println!("{:?}", handle.join());
+
+    let lock = MY_SHARED.lock();
+    println!("{lock:?}");
+}
+```
