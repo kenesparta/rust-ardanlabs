@@ -1,4 +1,5 @@
 ## Spawn threads with parameters
+
 ```rust
 fn hello_thread(n: i32) {
     print!("Hello from thread {n}\n");
@@ -26,7 +27,9 @@ fn main() {
         .for_each(|h| println!("{}", h.join().expect("")));
 }
 ```
+
 ## Dividing workloads
+
 ```rust
 fn main() {
     const N_THREADS: usize = 5;
@@ -49,6 +52,7 @@ fn main() {
 ```
 
 ## ThreadBuilder
+
 ```rust
 use std::thread;
 
@@ -70,6 +74,7 @@ fn main() {
 ```
 
 ## Scoped Threads
+
 ```rust
 use std::thread;
 
@@ -95,7 +100,9 @@ fn main() {
 ```
 
 ## Sharing Data with atomics
+
 A counter using unsafe, without atomics
+
 ```rust
 // Creating a global variable
 static mut COUNTER: i32 = 0;
@@ -120,6 +127,7 @@ fn main() {
 ```
 
 With `std::sync::atomic`:
+
 ```rust
 use std::sync::atomic::AtomicI32;
 use std::sync::atomic::Ordering::Relaxed;
@@ -145,6 +153,7 @@ fn main() {
 ```
 
 ## Sharing data with Mutexes
+
 Is slower than Atomics.
 
 ```rust
@@ -156,7 +165,7 @@ static NUMBERS: Mutex<Vec<u32>> = Mutex::new(Vec::new());
 fn main() {
     let mut handles = Vec::new();
     for _ in 0..10 {
-        let handle= thread::spawn(|| {
+        let handle = thread::spawn(|| {
             let mut lock = NUMBERS.lock().unwrap();
             lock.push(1);
         });
@@ -168,3 +177,9 @@ fn main() {
     println!("{:#?}", lock)
 }
 ```
+
+# Documentation:
+
+- The top of our library (each public module) should have a documentation comment `//!` indicates the scope level
+  documentation. This is where we should describe the purpose of the library.
+- Function level Doc: you should also document every public function and struct, we can do that using this `///`
