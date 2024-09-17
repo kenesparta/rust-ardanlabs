@@ -1,24 +1,19 @@
-use std::sync::Mutex;
-use std::thread;
+use dashmap::DashMap;
+use once_cell::sync::Lazy;
 
-static MY_SHARED: Mutex<u32> = Mutex::new(3);
-
-fn poisoner() {
-    let mut lock = MY_SHARED.lock().unwrap();
-    *lock += 1;
-    panic!("The poisoner strikes!")
-}
+static SHARED: Lazy<DashMap<u32, u32>> = Lazy::new(DashMap::new);
 
 fn main() {
-    let handle = thread::spawn(poisoner);
-    println!("trying to return from the thread");
-    println!("{:?}", handle.join());
+    for n in 0..100 {
+        std::thread::spawn(move || {
+            if let Some(mut v) = SHARED.get_mut(&n) {
+                *v += 1
+            } else {
+                SHARED.insert(n, n);
+            }
+        });
+    }
 
-    let lock = MY_SHARED.lock();
-    println!("{lock:?}");
-
-    let recover_data = lock.unwrap_or_else(|p| {
-        println!("Reovering data");
-        p.into_inner()
-    });
+    std::thread::sleep(std::time::Duration::from_secs(2));
+    println!("{:#?}", SHARED);
 }
