@@ -5,5 +5,6 @@ members = [
     "basics/login",
     "basics/variables",
     "projects/cli-app",
-    "async-mt"
+    "async-mt",
+    "zero2prod"
 ]
