@@ -4,8 +4,12 @@ install-sqlx-cli:
       --features rustls,postgres
 
 up-db:
-	./scripts/init_db.sh
+	SKIP_DOCKER=true ./scripts/init_db.sh
+
+create-migration:
+	export DATABASE_URL=postgres://app:secret@127.0.0.1:5432/newsletter
+	sqlx migrate add create_subscriptions_table
 
 migrate:
 	export DATABASE_URL=postgres://app:secret@127.0.0.1:5432/newsletter
-	sqlx migrate add create_subscriptions_table
+	sqlx migrate run
