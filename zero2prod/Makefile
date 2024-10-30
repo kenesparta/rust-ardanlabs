@@ -13,3 +13,6 @@ create-migration:
 migrate:
 	export DATABASE_URL=postgres://app:secret@127.0.0.1:5432/newsletter
 	sqlx migrate run
+
+sqlx-prepare:
+	cargo sqlx prepare --database-url postgres://app:secret@localhost:5432/newsletter

@@ -19,3 +19,5 @@ Cargo.lock
 /target
 .idea
 **/users.json
+zero2prod/.env
+.DS_Store
