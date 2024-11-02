@@ -1,24 +1,29 @@
-use sqlx::{query, Connection, PgConnection};
+use sqlx::{query, Connection, PgConnection, PgPool};
 use std::net::TcpListener;
 use zero2prod::configuration::get_configuration;
 use zero2prod::startup::run;
 
-// `tokio::test` is the testing equivalent of `tokio::main`.
-// It also spares you from having to specify the `#[test]` attribute.
-//
-// You can inspect what code gets generated using
-// `cargo expand --test health_check` (<- name of the test file)
+pub struct TestApp {
+    pub address: String,
+    pub db_pool: PgPool,
+}
+
+/// `tokio::test` is the testing equivalent of `tokio::main`.
+/// It also spares you from having to specify the `#[test]` attribute.
+///
+/// You can inspect what code gets generated using
+/// `cargo expand --test health_check` (<- name of the test file)
 #[tokio::test]
 async fn health_check_works() {
     // Arrange
-    let addr = spawn_app();
+    let app = spawn_app().await;
     // We need to bring in `reqwest`
     // to perform HTTP requests against our application.
     let client = reqwest::Client::new();
 
     // Act
     let response = client
-        .get(&format!("{}/health_check", addr))
+        .get(&format!("{}/health_check", app.address))
         .send()
         .await
         .expect("Failed to execute request.");
@@ -30,7 +35,7 @@ async fn health_check_works() {
 
 #[tokio::test]
 async fn subscribe_returns_a_200_for_valid_form_data() {
-    let addr = spawn_app();
+    let app = spawn_app().await;
     let configuration = get_configuration().expect("Failed to read configuration.");
     let connection_string = configuration.database.connection_string();
     // The `Connection` trait MUST be in scope for us to invoke
@@ -44,7 +49,7 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
     // Act
     let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
     let response = client
-        .post(&format!("{}/subscriptions", &addr))
+        .post(&format!("{}/subscriptions", &app.address))
         .header("Content-Type", "application/x-www-form-urlencoded")
         .body(body)
         .send()
@@ -57,12 +62,14 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
         .fetch_one(&mut connection)
         .await
         .expect("Failed to fetch saved subscription.");
+    assert_eq!(saved.email, "ursula_le_guin@gmail.com");
+    assert_eq!(saved.name, "le guin");
 }
 
 #[tokio::test]
 async fn subscribe_returns_a_400_when_data_is_missing() {
     // Arrange
-    let app_address = spawn_app();
+    let app = spawn_app().await;
     let client = reqwest::Client::new();
     let test_cases = vec![
         ("name=le%20guin", "missing the email"),
@@ -73,7 +80,7 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
     for (invalid_body, error_message) in test_cases {
         // Act
         let response = client
-            .post(&format!("{}/subscriptions", &app_address))
+            .post(&format!("{}/subscriptions", &app.address))
             .header("Content-Type", "application/x-www-form-urlencoded")
             .body(invalid_body)
             .send()
@@ -92,10 +99,18 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
 }
 
 // Launch our application in the background ~somehow~
-fn spawn_app() -> String {
+async fn spawn_app() -> TestApp {
     let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind a port");
     let port = listener.local_addr().unwrap().port();
-    let server = run(listener).expect("failed executing zero2prod.");
+    let configuration = get_configuration().expect("Failed to read configuration.");
+    let connection_pool = PgPool::connect(&configuration.database.connection_string())
+        .await
+        .expect("Failed to connect to Postgres.");
+    let server = run(listener, connection_pool.clone()).expect("failed executing zero2prod.");
     let _ = tokio::spawn(server);
-    format!("http://127.0.0.1:{}", port)
+    let address = format!("http://127.0.0.1:{}", port);
+    TestApp {
+        address,
+        db_pool: connection_pool,
+    }
 }
