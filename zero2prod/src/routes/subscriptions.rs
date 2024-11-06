@@ -9,7 +9,10 @@ pub struct FormData {
     name: String,
 }
 
-// Let's start simple: we always return a 200 OK
+/// Story
+/// > As a blog visitor,
+/// > I want to subscribe to the newsletter,
+/// > So that I can receive email updates when new content is published on the blog.
 pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> HttpResponse {
     match sqlx::query!(
         r#"
