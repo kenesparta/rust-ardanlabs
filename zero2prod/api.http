@@ -1,4 +1,4 @@
 POST http://127.0.0.1:8000/subscriptions
 Content-Type: application/x-www-form-urlencoded
 
-email=thomas_mann@hotmail.com&name=Tom
+email=thomas_mann555@hotmail.com&name=Tom5555
