@@ -26,17 +26,6 @@ pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> Ht
 
     let query_span = tracing::info_span!("Saving new subscriber details in the database");
 
-    // tracing::info!(
-    //     "request_id {} - Adding '{}' '{}' as a new subscriber.",
-    //     request_id,
-    //     form.email,
-    //     form.name
-    // );
-    // tracing::info!(
-    //     "request_id {} - Saving new subscriber details in the database",
-    //     request_id
-    // );
-
     match sqlx::query!(
         r#"
         INSERT INTO subscriptions (id, email, name, subscribed_at)
