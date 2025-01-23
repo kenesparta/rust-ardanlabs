@@ -305,5 +305,79 @@ fn main() {
 
 # Rayon
 ```rust
+use rayon::prelude::*;
 
+fn main() {
+    let numbers: Vec<u64> = (0..1_000_000).collect();
+    let sum = numbers.par_iter().sum::<u64>();
+    println!("Sum: {:?}", sum);
+}
+```
+
+```rust
+use rayon::prelude::*;
+
+fn is_prime(n: &u32) -> bool {
+    (2..=n/2).into_par_iter().all(|x| n % x != 0)
+}
+
+fn main() {
+    let now = std::time::Instant::now();
+    let numbers: Vec<u32> = (0..1_000).collect();
+    let mut primes: Vec<&u32> = numbers.par_iter().filter(|x| is_prime(*x)).collect();
+    primes.par_sort_unstable();
+    let elapsed = now.elapsed().as_secs_f32();
+    println!("found {:?} primes in {:?} secs", primes.len(), elapsed);
+}
+```
+
+```rust
+fn main() {
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(8)
+        .build()
+        .unwrap();
+
+    pool.spawn(|| println!("Hello from pool thread!"));
+    pool.scope(|scope| {
+        for n in 0..20 {
+            scope.spawn(move |_| {
+                println!("Hello from thread pool number {}", n);
+            });
+        }
+    });
+
+    println!("Hello from the main thread!");
+}
+```
+
+```rust
+fn main() {
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(8)
+        .build()
+        .unwrap();
+
+    pool.scope(|scope| {
+        scope.spawn_broadcast(|_, broadcast_ctx| {
+            println!("Hello from broadcast thread! {}", broadcast_ctx.index());
+        })
+    });
+}
+```
+
+```rust
+fn test() {
+    println!("Hello, test!");
+}
+
+
+fn main() {
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(8)
+        .build()
+        .unwrap();
+
+    pool.join(test, test);
+}
 ```
