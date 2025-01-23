@@ -183,3 +183,4 @@ fn main() {
 - The top of our library (each public module) should have a documentation comment `//!` indicates the scope level
   documentation. This is where we should describe the purpose of the library.
 - Function level Doc: you should also document every public function and struct, we can do that using this `///`
+
