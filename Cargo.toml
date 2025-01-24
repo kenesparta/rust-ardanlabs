@@ -7,5 +7,7 @@ members = [
     "projects/cli-app",
     "async-mt",
     "ay-aw-conc",
+    "raas",
+    "best-practices",
     "zero2prod"
 ]
