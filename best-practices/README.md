@@ -8,6 +8,41 @@ Iterators Key benefits:
 - More expressive and composable code
 - Thread safety through immutable access
 
+## Minimizing cloning
+
+Here's how to minimize cloning in Rust:
+```rust
+// 1. Use references when possible
+let data = vec![1, 2, 3];
+// Bad: data.clone()
+// Good: &data
+
+// 2. Use Cow for conditional cloning
+use std::borrow::Cow;
+fn process(input: &str) -> Cow<str> {
+    if input.is_empty() {
+        Cow::Borrowed(input)    // No clone needed
+    } else {
+        Cow::Owned(input.to_uppercase())  // Clone only when needed
+    }
+}
+
+// 3. Use into_iter() for ownership transfer
+let strings = vec!["hello".to_string()];
+// Bad: strings.iter().cloned()
+// Good: strings.into_iter()
+
+// 4. Use String::from instead of to_string()
+// Bad: "hello".to_string()
+// Good: String::from("hello")
+
+// 5. Implement Clone judiciously
+#[derive(Clone)]  // Only when necessary
+struct Data {
+    field: String,
+}
+```
+
 ## Do not emulate OOP
 
 ```rust
