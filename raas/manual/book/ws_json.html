@@ -1,0 +1,363 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>JSON - Rust as a Service</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Rust as a Service</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="json"><a class="header" href="#json">JSON</a></h1>
+<p>We've sent and received plain text, which is often enough. But what if we want to stream some structured data in JSON, for example to update some telemetry at a high rate?</p>
+<p>The code for this is in <code>code/wss/ws_json</code>.</p>
+<p>Let's start by creating a project and dependencies:</p>
+<pre><code class="language-bash">cargo new ws_json
+cd ws_json
+cargo add tokio -F full
+cargo add axum -F ws
+cargo add serde -F derive
+cargo add serde_json
+</code></pre>
+<p>Now we'll build a server. It's very similar to the echo example, but we've added strongly typed JSON:</p>
+<pre><pre class="playground"><code class="language-rust">use axum::{
+    extract::{ws::WebSocket, WebSocketUpgrade},
+    response::{Html, IntoResponse},
+    routing::get,
+    Router,
+};
+use serde::{Deserialize, Serialize};
+
+#[tokio::main]
+async fn main() {
+    let app = Router::new()
+        .route("/ws", get(ws_handler))
+        .route("/", get(site));
+
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+    axum::serve(listener, app).await.unwrap();
+}
+
+#[derive(Serialize, Deserialize)]
+enum Request {
+    NextPoint,
+    Quit
+}
+
+#[derive(Serialize, Deserialize)]
+struct Point {
+    x: f32,
+    y: f32,
+}
+
+async fn site() -&gt; Html&lt;&amp;'static str&gt; {
+    const BODY: &amp;str = include_str!("json.html");
+    Html(BODY)
+}
+
+async fn ws_handler(ws: WebSocketUpgrade) -&gt; impl IntoResponse {
+    ws.on_upgrade(move |sock| handle_socket(sock))
+}
+
+async fn handle_socket(mut socket: WebSocket) {
+    let mut tick = 0.0f32;
+    while let Some(Ok(msg)) = socket.recv().await {
+        let text = msg.to_text().unwrap();
+        let req: Request = serde_json::from_str(text).unwrap();
+        match req {
+            Request::NextPoint =&gt; {
+                let response = Point {
+                    x: tick.cos() * (tick / 10.0),
+                    y: tick.sin() * (tick / 10.0),
+                };
+                let response = serde_json::to_string(&amp;response).unwrap();
+                socket.send(response.into()).await.unwrap();
+
+                tick += 0.01;
+                if tick &gt; 4_000.0 {
+                    tick = 0.0;
+                }
+            }
+            Request::Quit =&gt; {
+                break;
+            }
+        }
+    }
+}</code></pre></pre>
+<p>Notice how we:</p>
+<ul>
+<li>Use Serde's <code>Serialize</code> and <code>Deserialize</code> to make our two data-types serializable.</li>
+<li>Setup a request/response format.</li>
+<li>When we receive a message, we deserialize it ourselves.</li>
+<li>We maintain state within the <code>handle_socket</code> function. Each function runs independently---so the state is <em>local</em> to a connection. If we connect twice, each will run the full cycle.</li>
+<li>Quitting is as simple as breaking out of the handler loop, which will drop the socket.</li>
+</ul>
+<p>The client side (<code>json.html</code>) is a bit complicated, so let's cut and paste it:</p>
+<pre><code class="language-html">&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;WebSocket Echo Client&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;canvas id="myCanvas" width="600" height="600"&gt;&lt;/canvas&gt;
+    &lt;div id="counter"&gt;&lt;/div&gt;
+
+    &lt;script&gt;
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext("2d");
+        const requestNext = { NextPoint : null };
+        const start = Date.now();
+        let red = 0;
+        let iterations = 0;
+
+        var ws = new WebSocket("ws://localhost:3001/ws");
+        ws.onopen = function() {
+            console.log("onopen");
+            ws.send(JSON.stringify(requestNext));
+        };
+        ws.onmessage = function(e) {
+            let message = JSON.parse(e.data);
+            // Move to the center
+            message.x += 300;
+            message.y += 300;
+            ctx.fillStyle = "rgb(" + red + ", 0, 0)";
+            red += 1;
+            red %= 255;
+            ctx.fillRect(message.x, message.y, 1, 1);
+            iterations += 1;
+            document.getElementById("counter").innerHTML = iterations;
+
+            if (iterations &lt; 200000) {
+                ws.send(JSON.stringify(requestNext));
+            } else {
+                const end = Date.now();
+                const time = end - start;
+                const speed = iterations / time;
+                document.getElementById("counter").innerHTML = "Iterations: " + iterations + " Time: " + time + " Speed: " + speed.toFixed(2) + " points/ms";
+                ws.send(JSON.stringify({ Quit : null }));
+            }
+        };
+        ws.onclose = function() {
+            console.log("onclose");
+        };
+        ws.onerror = function(e) {
+            console.log("onerror: " + e.data);
+        };
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>Go to <a href="http://localhost:3001">http://localhost:3001</a> and see. Great performance! And more importantly, all 200,000 requests have used a single TCP stream---and a single header. Once the socket is running, it's very low overhead.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="ws_client.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="svc_deploy_intro.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="ws_client.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="svc_deploy_intro.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

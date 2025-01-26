@@ -1,0 +1,3368 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Rust as a Service</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Rust as a Service</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<blockquote>
+<p>All of this class material, including the code, is available at <a href="https://github.com/thebracket/ArdanRustService">this Github repo</a></p>
+</blockquote>
+<p>This class will cover the ins and outs of integrating Rust into a Service-Oriented-Architecture. In this class, we'll go over:</p>
+<ul>
+<li>Building a REST service
+<ul>
+<li>Start with a minimal HTTP server.</li>
+<li>Add state, immutable and mutable.</li>
+<li>Add services with layers.</li>
+<li>Nest multiple routers together.</li>
+<li>Call other REST services.</li>
+<li>Error Handling.</li>
+<li>Utilizing Middleware.</li>
+<li>Using Headers.</li>
+<li>Additional Layer Services.</li>
+</ul>
+</li>
+<li>Tracing
+<ul>
+<li>Logging</li>
+<li>Timing with Spans</li>
+<li>Timing Axum Requests from end-to-end</li>
+<li>Logging targets: stdout, files, JSON</li>
+<li>OpenTelemetry</li>
+</ul>
+</li>
+<li>Documenting your REST API with OpenAPI</li>
+<li>Service Configuration
+<ul>
+<li>Environment Variables</li>
+<li>Files</li>
+<li>HTTP sources</li>
+<li>The Command Line</li>
+</ul>
+</li>
+<li>gRPC
+<ul>
+<li>Tonic - the gRPC server</li>
+<li>Streaming</li>
+</ul>
+</li>
+<li>Web Sockets
+<ul>
+<li>Web Socket server</li>
+<li>Web Sockets and Serialization</li>
+<li>Web Socket Client</li>
+</ul>
+</li>
+<li>Service Deployment</li>
+<li>Service Design</li>
+</ul>
+<h2 id="about-herbert-wolverson"><a class="header" href="#about-herbert-wolverson">About Herbert Wolverson</a></h2>
+<p>Herbert has been developing software professionally for more than 20 years. Starting with BASIC, Pascal, and then moving onto C and C++, Herbert has developed custom applications ranging from web-server filters to games. Herbert is the author of Hands-on Rust and Rust Brain Teasers.</p>
+<div class="table-wrapper"><table><thead><tr><th>Book</th><th></th><th>Publisher E-Book</th><th>Amazon</th></tr></thead><tbody>
+<tr><td>Hands-on Rust</td><td><img src="./images/Hands-on-Rust.png" alt="" /></td><td><a href="https://pragprog.com/titles/hwrust/hands-on-rust/">PragProg Page</a></td><td><a href="https://www.amazon.com/Hands-Rust-Effective-Learning-Development/dp/1680508164">Amazon Page</a></td></tr>
+<tr><td>Rust Brain Teasers</td><td><img src="./images/Rust-Brain-Teasers.png" alt="" /></td><td><a href="https://pragprog.com/titles/hwrustbrain/rust-brain-teasers/">PragProg Page</a></td><td><a href="https://www.amazon.com/Rust-Brain-Teasers-Pragmatic-Programmers/dp/1680509179">Amazon Page</a></td></tr>
+</tbody></table>
+</div>
+<h2 id="resources"><a class="header" href="#resources">Resources</a></h2>
+<p>I recommend bookmarking the following resources:</p>
+<ul>
+<li><a href="https://doc.rust-lang.org/book/">The Rust Programming Language</a></li>
+<li><a href="https://doc.rust-lang.org/rust-by-example/">Rust by Example</a></li>
+<li><a href="https://doc.rust-lang.org/std/">Rust Standard Library Documentation</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="rest-service"><a class="header" href="#rest-service">REST Service</a></h1>
+<p>We'll get started by building a simple REST service using Tokio and Axum. We've covered this in Rust Foundations and other online content, so we'll blast through pretty quickly. The objective is to get you up and running making and consuming REST services. This will serve as the basis for much of this lession.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="minimal-http-server"><a class="header" href="#minimal-http-server">Minimal HTTP Server</a></h1>
+<p>Let's start by creating a new project with <code>cargo new simple_http_server</code>. This will create a project containing a <code>Cargo.toml</code> file, a <code>src</code> folder and a <code>main.rs</code> file. These are a default "hello world" program.</p>
+<p>Now change directory to the new project, and add some dependencies:</p>
+<pre><code class="language-bash">cargo add axum
+cargo add tokio -F full
+</code></pre>
+<p>We can change the <code>main.rs</code> file to bootstrap a very simple HTTP server, much like we did in Rust Foundations:</p>
+<blockquote>
+<p>This example is in the <code>code/rest_service/simple_http_server</code> project example.</p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use axum::{response::Html, routing::get, Router};
+
+#[tokio::main]
+async fn main() {
+    let app = Router::new().route("/", get(handler));
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn handler() -&gt; Html&lt;&amp;'static str&gt; {
+    Html("&lt;h1&gt;Hello, World!&lt;/h1&gt;")
+}</code></pre></pre>
+<p>You can run this with <code>cargo run</code>, and it will serve "Hello, World!" on TCP port 3001.</p>
+<p>This is a very minimal example, but demonstrates how Axum provides a very simple mechanism for getting up and running quickly.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="understanding-the-service-stack"><a class="header" href="#understanding-the-service-stack">Understanding the Service Stack</a></h1>
+<p>Despite being 14 lines of code (including whitespace), the <code>simple_http_server</code> example actually does quite a lot. Before we dive into expanding it, lets take a quick tour through <em>how</em> Axum is making your system function.</p>
+<p>Axum is built on a stack of different services:</p>
+<div class="table-wrapper"><table><thead><tr><th><strong>Layer</strong></th><th><strong>Purpose</strong></th></tr></thead><tbody>
+<tr><td><strong>Tokio</strong></td><td>Provides an async runtime and executor. By default it runs one thread per core, with work-stealing. It can be configured to run single-threaded, or on a limited number of threads.</td></tr>
+<tr><td><strong>Hyper</strong></td><td>Provides HTTP services, including request/response formatting and parsing. You <em>can</em> provide services with plain hyper, but by default the full stack will be invoked.</td></tr>
+<tr><td><strong>Tower</strong></td><td>Provides a middleware service layer on top of Hyper and Tokio. Tower can be used for everything from providing timeout services to authentication layers. Tower layers and extensions can be provided to Axum applications through dependency injection.</td></tr>
+</tbody></table>
+</div>
+<blockquote>
+<p>Keep this in mind as we progress. Services typically touch each layer, making use of that layer's speciality.</p>
+</blockquote>
+<h1 id="web-request-lifecycle"><a class="header" href="#web-request-lifecycle">Web Request Lifecycle</a></h1>
+<p>You open a browser (or CLI client) and go to "http://example.com/my_page". What is actually happening?</p>
+<h2 id="1-your-browser-sends-a-get-request"><a class="header" href="#1-your-browser-sends-a-get-request">1. Your Browser sends a GET request</a></h2>
+<p>Your browser opens a TCP connection to the desired endpoint. It then sends a complete request:</p>
+<pre><code>GET /axum_hyper_tower_tokio.html HTTP/1.1
+Host: localhost:3000
+User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Referer: http://localhost:3000/rest_service.html
+Connection: keep-alive
+Cookie: Rustrover-e66a9a18=970c1180-bdea-4b4b-a21e-e657e49936b3; sysauth_localhost:9000_80=0ab787d88dc1e09f564d5ccc229bf9d0; User-Token=377b8330-6625-470c-9b73-5f569b130dfa
+Upgrade-Insecure-Requests: 1
+Sec-Fetch-Dest: document
+Sec-Fetch-Mode: navigate
+Sec-Fetch-Site: same-origin
+Pragma: no-cache
+Cache-Control: no-cache
+</code></pre>
+<p>The request includes the URL you want, the host you called, encodings you'll accept, your preferred language, the previous referral page, any cookies, token headers, cache-control - a <em>lot</em> of data. If you're writing the client, you can add more headers.</p>
+<h2 id="2-the-server-receives-your-request"><a class="header" href="#2-the-server-receives-your-request">2. The Server Receives your Request</a></h2>
+<p>All of the header information is accepted by your server, and encoded. <code>Hyper</code> takes care of this. <code>Hyper</code> creates a <code>Request</code> object.</p>
+<h2 id="3-the-method-and-url-are-matched-against-a-router"><a class="header" href="#3-the-method-and-url-are-matched-against-a-router">3. The Method and URL are Matched Against a Router</a></h2>
+<p>Given <code>GET</code> and <code>/test_page</code>, Axum scans the active <code>Router</code> object to find a router that matches the request.</p>
+<h2 id="4-layers-are-invoked"><a class="header" href="#4-layers-are-invoked">4. Layers are Invoked</a></h2>
+<p>Any layers that are attached to your <code>Router</code> and operate on <code>Request</code> objects are called. They are called in turn, one at a time---passing the modified <code>Request</code> on to the next one.</p>
+<h2 id="5-handler-matching-and-dependency-injection"><a class="header" href="#5-handler-matching-and-dependency-injection">5. Handler Matching and Dependency Injection</a></h2>
+<p>Once layers are done, the <code>Request</code> is passed to the <code>Router</code>. Your handler's function signature has been built to include requests for any dependencies that are required. These are collected.</p>
+<h2 id="6-your-handler-runs"><a class="header" href="#6-your-handler-runs">6. Your Handler Runs</a></h2>
+<p>After all this, your handler finally runs! It receives any dependencies given to it by previous layers. Your Handler returns a <code>Response</code> object. <code>Hyper</code> and <code>Axum</code> collectively encode it to include not just your content but all headers that are required.</p>
+<h2 id="7-layers-are-invoked"><a class="header" href="#7-layers-are-invoked">7. Layers are Invoked</a></h2>
+<p>Any layers that operate on <code>Response</code> objects are invoked. <code>tower_http</code> provides a lot of these, for example to compress your data.</p>
+<h2 id="8-the-response-is-sent"><a class="header" href="#8-the-response-is-sent">8. The Response is Sent</a></h2>
+<p>Finally, the webserver sends your response to the client.</p>
+<p>So HTTP is deceptively simple: there's a lot going on here! The Axum/Tower/Hyper/Tokio stack gives you a great deal of control over each step.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="extractors"><a class="header" href="#extractors">Extractors</a></h1>
+<p>In the minimal example, your route is controlled with this line of code:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>.route("/", get(handler));
+<span class="boring">}</span></code></pre></pre>
+<p>The matching handler runs with no parameters:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn handler() -&gt; Html&lt;&amp;'static str&gt; {
+    Html("&lt;h1&gt;Hello, World!&lt;/h1&gt;")
+}
+<span class="boring">}</span></code></pre></pre>
+<p>The <code>handler()</code> portion has no parameters - it's not requesting any additional information. The <code>Html&lt;&gt;</code> represents a <em>Response</em>---we'll talk about customizing responses later.</p>
+<p>But what if you <em>want</em> to know more about the request? Axum provides <em>extractors</em>---which run as part of the <code>Request</code> portion of the lifecycle.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="path-extraction"><a class="header" href="#path-extraction">Path Extraction</a></h1>
+<p>Say you want to implement an API that responds to <code>/book/1</code> and <code>/book/2</code> by returning that book's data. This can be accomplished with a <em>path extractor</em>.</p>
+<blockquote>
+<p>The code for this is in <code>code/rest_service/axum_extract/path</code>.</p>
+</blockquote>
+<p>Here's a working example:</p>
+<pre><pre class="playground"><code class="language-rust">use axum::{response::Html, routing::get, Router};
+use axum::extract::Path;
+
+#[tokio::main]
+async fn main() {
+    let app = Router::new()
+        .route("/book/:id", get(path_extract));
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn path_extract(
+    Path(id): Path&lt;u32&gt;,
+) -&gt; Html&lt;String&gt;
+{
+    Html(format!("Hello, {}!", id))
+}</code></pre></pre>
+<p>What's different here?</p>
+<ul>
+<li>The route includes <code>:id</code> as a placeholder identifying where the path matching should occur.</li>
+<li>The handler declares <code>Path(id): Path&lt;u32&gt;</code> as a parameter.
+<ul>
+<li><code>Path(id)</code> means "match the Path extractor, and name the result id".
+<ul>
+<li><code>Path(..)</code> is actually <em>destructuring</em>. You can pattern match in function parameters.</li>
+</ul>
+</li>
+<li><code>Path&lt;u32&gt;</code> specifies the actually injected type. If a non-u32 type is specified, it won't be passed to the handler (you can use other types).</li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="query-extraction"><a class="header" href="#query-extraction">Query Extraction</a></h1>
+<p>You can also extract the query string as a set of names and values:</p>
+<blockquote>
+<p>The code for this is in <code>code/rest_service/axum_extract_query</code>.</p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use std::collections::HashMap;
+
+use axum::{response::Html, routing::get, Router};
+use axum::extract::Query;
+
+#[tokio::main]
+async fn main() {
+    let app = Router::new()
+        .route("/book", get(query_extract));
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn query_extract(
+    Query(params): Query&lt;HashMap&lt;String, String&gt;&gt;,
+) -&gt; Html&lt;String&gt;
+{
+    Html(format!("{:#?}", params))
+}</code></pre></pre>
+<p>Once again, we've used an extractor---this time <code>Query</code>. We've asked to extract query parameters into a <code>HashMap</code> of strings, and just printed the result.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="header-extraction"><a class="header" href="#header-extraction">Header Extraction</a></h1>
+<p>You can extract all the HTTP headers:</p>
+<pre><pre class="playground"><code class="language-rust">use axum::{response::Html, routing::get, Router};
+use axum::http::header::HeaderMap;
+
+#[tokio::main]
+async fn main() {
+    let app = Router::new()
+        .route("/book", get(header_extract));
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn header_extract(
+    headers: HeaderMap,
+) -&gt; Html&lt;String&gt;
+{
+    Html(format!("{:#?}", headers))
+}</code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="more-extractors"><a class="header" href="#more-extractors">More Extractors</a></h1>
+<p>There are a lot more extraction options. See <a href="https://docs.rs/axum/latest/axum/extract/index.html#applying-multiple-extractors">https://docs.rs/axum/latest/axum/extract/index.html#applying-multiple-extractors</a> for an exhaustive list!</p>
+<ul>
+<li>You can include <code>body: String</code> to receive the entire posted body as a string.</li>
+<li>You can include <code>body: Bytes</code> to receive the entire posted body as an array of bytes.</li>
+<li>You can include <code>request: Request</code> to receive the entire HTTP request!</li>
+</ul>
+<p>You can also use the <code>Json</code> extractor. We'll use this in practice later, so we're not going to dwell on it now - but any <code>Deserializable</code> type (implementing Serde's trait) can be posted as JSON and automatically converted into a strong type.</p>
+<p>A few more things to note:</p>
+<ul>
+<li>You can make an extractor <em>optional</em>. <code>Option&lt;my extractor&gt;</code> lets you still match the route if an extraction wasn't provided.</li>
+<li>You can wrap a strong typed extractor (such as Json) in <code>Result&lt;Json&lt;MyType&gt;&gt;</code> and check to see if deserialization worked---and see an error message telling you what went wrong.</li>
+</ul>
+<p>We'll deal with <em>extensions</em> next.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="add-a-simple-tower-layer-state"><a class="header" href="#add-a-simple-tower-layer-state">Add a Simple Tower Layer: State</a></h1>
+<p>The previous example wasn't really using Tower at all, other than inside Axum's internals. You've used Tower layers in Rust Foundations, but only skimmed the surface.</p>
+<p>Let's make a <em>very simple</em> example of a Tower service. We'll share some configuration with our Axum handler methods.</p>
+<p>We'll start with the <code>simple_http_server</code> code and add to it.</p>
+<blockquote>
+<p>The code for this is in <code>code/rest_service/simple_tower_server</code>.</p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use axum::{response::Html, routing::get, Router};
+use axum::extract::State;
+use std::sync::Arc;
+
+struct MyConfig {
+    config_string: String,
+}
+
+#[tokio::main]
+async fn main() {
+    let shared_config = Arc::new(MyConfig {
+        config_string: "My Config String".to_string(),
+    });
+
+    let app = Router::new()
+        .route("/", get(handler))
+        .with_state(shared_config);
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn handler(State(config): State&lt;Arc&lt;MyConfig&gt;&gt;) -&gt; Html&lt;String&gt; {
+    Html(format!("&lt;h1&gt;{}&lt;/h1&gt;", config.config_string))
+}</code></pre></pre>
+<p>Let's look at what changed:</p>
+<ul>
+<li><code>use axum::extract::State;</code> indicates that we want to use Axum's <em>extractor</em> named <code>State</code>. Extractors obtain data for incoming requests. State is a built-in service that uses Tower to allow you to attach state objects to requests.</li>
+<li>We've created a new type, <code>MyConfig</code>. We'll use this to store some state.</li>
+<li>We initialize the config and wrap it in an <code>Arc</code>. In Rust Foundations, we disucssed arc. It reference counts a single instance of a type, in a thread-safe fashion. So you will only have one <code>MyConfig</code>, it can be shared between threads---read only.</li>
+<li>We added <code>with_state</code> to inject the state <em>into</em> our <code>Router</code>.</li>
+<li>The handler now has the parameter <code>State(config): State&lt;Arc&lt;MyConfig&gt;&gt;</code>.
+<ul>
+<li>The left part <code>State(config)</code> indicates that we want to retrieve some state and refer to it as <code>config</code> in the handler.</li>
+<li>The right part lists the full type we want to receive: <code>Arc&lt;MyConfig&gt;</code>, which will be wrapped in <code>State</code>.</li>
+</ul>
+</li>
+<li>We return an <code>Html&lt;String&gt;</code> - we'll build the response dynamically as a string.</li>
+<li>We use <code>format</code> to include the contents of the state object.</li>
+</ul>
+<p>So what have we achieved? We've got a global variable, shared between everything in our <code>Router</code>---but without the messiness of a global variable. The global remains protected by Rust's borrow checker---race conditions won't compile.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="add-a-simple-tower-layer-mutable-state"><a class="header" href="#add-a-simple-tower-layer-mutable-state">Add a Simple Tower Layer (Mutable State)</a></h1>
+<p>State and layers still obey Rust's rules: you can't change shared state without locking it in some way (atomics or a lock). We've added global immutable state---let's create global mutable state.</p>
+<p>We'll start with the <code>simple_tower_server</code> code and add to it.</p>
+<blockquote>
+<p>The code for this is in <code>code/rest_service/simple_tower_server_mut</code>.</p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use axum::{response::Html, routing::get, Router};
+use axum::extract::State;
+use std::sync::Arc;
+use std::sync::atomic::AtomicUsize;
+
+struct MyConfig {
+    counter: AtomicUsize,
+}
+
+#[tokio::main]
+async fn main() {
+    let shared_config = Arc::new(MyConfig {
+        counter: AtomicUsize::new(0),
+    });
+
+    let app = Router::new()
+        .route("/", get(handler))
+        .with_state(shared_config);
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn handler(State(config): State&lt;Arc&lt;MyConfig&gt;&gt;) -&gt; Html&lt;String&gt; {
+    config.counter.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    Html(format!("&lt;h1&gt;You are visitor number: {}&lt;/h1&gt;", 
+        config.counter.load(std::sync::atomic::Ordering::Relaxed)
+    ))
+}</code></pre></pre>
+<p>In this code we've changed:</p>
+<ul>
+<li>We're importing <code>AtomicUsize</code></li>
+<li>We've replaced the config string with an atomic counter.</li>
+<li>We set the counter to zero.</li>
+<li>The handler uses <code>fetch_add</code> to atomically increment the counter.</li>
+<li>We use <code>load</code> to fetch the new counter value and display it. (We could just return the number from <code>fetch_add</code>)</li>
+</ul>
+<p>We're using the <em>interior mutability</em> pattern we talked about it in Rust Foundations: the shared state remains immutable from the outside, but because it protects its mutable contents---it can be safely shared with an <code>Arc</code>.</p>
+<p>Now you have the ability to share mutable and immutable state.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="multiple-states"><a class="header" href="#multiple-states">Multiple States</a></h1>
+<p>Axum has a limitation that you can only have <em>one</em> state per <code>Router</code>. So now you face a choice:</p>
+<ol>
+<li>You can group everything into a single <code>State</code> object and use careful interior mutability.</li>
+<li>You can replace <code>State</code> with an <em>Extension Layer</em>.</li>
+</ol>
+<p>State is deliberately lightweight, and doesn't cause much extra processing. Layers are a little slower, because they invoke the Tower middleware system directly.</p>
+<blockquote>
+<p>Tip: Use state if you only need one. Extensions aren't <em>that</em> heavy, it will still perform very well.</p>
+</blockquote>
+<p>Let's rewrite out previous example using extensions, and have two extensions:</p>
+<blockquote>
+<p>The code for this example is in <code>code/rest_service/simple_tower_server_multi_state</code>.</p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use axum::Extension;
+use axum::{response::Html, routing::get, Router};
+use std::sync::Arc;
+use std::sync::atomic::AtomicUsize;
+
+struct MyCounter {
+    counter: AtomicUsize,
+}
+
+#[derive(Clone)]
+struct MyConfig {
+    text: String,
+}
+
+#[tokio::main]
+async fn main() {
+    let shared_counter = Arc::new(MyCounter {
+        counter: AtomicUsize::new(0),
+    });
+    let shared_text = Arc::new(MyConfig {
+        text: "You are dynamic visitor #".to_string(),
+    });
+
+    let app = Router::new()
+        .route("/", get(handler))
+        .layer(Extension(shared_counter))
+        .layer(Extension(shared_text));
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn handler(
+    Extension(counter): Extension&lt;Arc&lt;MyCounter&gt;&gt;,
+    Extension(config): Extension&lt;Arc&lt;MyConfig&gt;&gt;,
+) -&gt; Html&lt;String&gt; {
+    counter.counter.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    Html(format!("&lt;h1&gt;{} {}&lt;/h1&gt;",
+        config.text,
+        counter.counter.load(std::sync::atomic::Ordering::Relaxed)
+    ))
+}</code></pre></pre>
+<p>In addition to the obvious change (two states), we've replaced:</p>
+<ul>
+<li>The <code>.with_state</code> call is now <code>.layer(Extension(..))</code> in the route definition.</li>
+<li>Each <code>Extension</code> is injected into the <code>handler</code> with <code>Extension(name): Extension&lt;Arc&lt;type&gt;&gt;</code>.</li>
+<li>We used both extensions to create the output.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="quick-recap-on-state-and-layers"><a class="header" href="#quick-recap-on-state-and-layers">Quick Recap on State and Layers</a></h1>
+<p>So to recap what we've gone over:</p>
+<ul>
+<li>A <code>Router</code> provides a connection between an URL and HTTP method, and a handler function.</li>
+<li>Routers can hold <code>State</code> objects, which are available for injection into any handler function called by that router application.</li>
+<li>Routers can add <code>layer</code>s. The <code>Extension</code> layer serves as additional state, and can be used to share as many injectible dependencies as you want. State is <em>slightly</em> faster than layers, but less flexible.</li>
+<li>Shared data in both <em>state</em> and <em>extension layers</em> must still obey Rust's safety rules. No data-races here!</li>
+<li>Arc ensures that the object can be shared between threads/tasks, without duplication and with very low overhead.</li>
+<li>Interior mutability allows you to safely create mutable shared state.</li>
+</ul>
+<p>We've already got a pretty powerful engine. Let's start making it more useful.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="nesting-multiple-routers"><a class="header" href="#nesting-multiple-routers">Nesting Multiple Routers</a></h1>
+<p>Unless you are building a very simple system, you probably want to offer multiple services in the same container. We'll talk about deployment options later on, for now let's make use of nesting to combine two services into one container.</p>
+<p>You might find this useful if you have separate teams working on different parts of your application. You can easily divide responsibilities. It also makes for a cleaner, modular application.</p>
+<blockquote>
+<p>You can find this example in <code>code/simple_nested</code></p>
+</blockquote>
+<p>We'll start by making a new project as follows:</p>
+<pre><code class="language-bash">cargo new simple_nested
+cargo add axum
+cargo add tokio -F full
+</code></pre>
+<p>Then let's build a simple dual-service server:</p>
+<blockquote>
+<p>The code for this is in <code>code/rest_service/simple_nested</code>.</p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use axum::{response::Html, routing::get, Router};
+
+#[tokio::main]
+async fn main() {
+
+    let app = Router::new()
+        .nest("/1", service_one())
+        .nest("/2", service_two());
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+
+fn service_one() -&gt; Router {
+    Router::new().route("/", get(|| async { 
+        Html("Service One".to_string()) }))
+}
+
+fn service_two() -&gt; Router {
+    Router::new().route("/", get(|| async { 
+        Html("Service Two".to_string()) }))
+}</code></pre></pre>
+<p>For the parent <code>Router</code>, we call <code>.nest</code> with a <em>parent path</em> and a function that returns a <code>Router</code>. These could be in different modules or crates. We also used an async closure to quickly build the response methods.</p>
+<p>The parent path is a concatenation:</p>
+<ul>
+<li>Service one starts with a <em>base</em> of <code>/1</code>---and then <code>/</code> is appended. The <em>result</em> is <code>/1/</code>.</li>
+<li>Service two starts with a <em>base</em> of <code>/2</code>---and then <code>/</code> is appended. The <em>result</em> is <code>/2/</code>.</li>
+</ul>
+<p>So now you can easily combine services in a single base executor. How does that work with layers and state?</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="nested-routers-with-state"><a class="header" href="#nested-routers-with-state">Nested Routers with State</a></h1>
+<p>You can add <code>State</code> and layers to nested services. The only potential surprise is that <code>Router</code>s don't see one another's state. You <em>can</em> inject the same state into multiple routers if you want to (and <code>Arc</code> is designed for that sort of thing)---but if you don't add it to a router, that router doesn't offer it to its handlers.</p>
+<p>Let's demonstrate this by adding some state to our previous example.</p>
+<blockquote>
+<p>The code for this is in <code>code/rest_service/simple_nested_state</code></p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use std::sync::Arc;
+use axum::{response::Html, routing::get, Router, extract::State};
+
+#[tokio::main]
+async fn main() {
+
+    let app = Router::new()
+        .nest("/1", service_one())
+        .nest("/2", service_two());
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+struct MyState {
+    n: i32,
+}
+
+fn service_one() -&gt; Router {
+    let state = Arc::new(MyState { n: 1 });
+    Router::new()
+        .route("/", get(handler))
+        .with_state(state)
+}
+
+fn service_two() -&gt; Router {
+    let state = Arc::new(MyState { n: 2 });
+    Router::new()
+        .route("/", get(handler))
+        .with_state(state)
+}
+
+async fn handler(State(my_state): State&lt;Arc&lt;MyState&gt;&gt;) -&gt; Html&lt;String&gt; {
+    Html(format!("State: {}", my_state.n))
+}</code></pre></pre>
+<p>So we're demonstrating that each <code>Router</code> has completely independent state: each has its own instance of <code>MyState</code>. The same thing works with extension layers. Your nested services can operate independently of one another.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="calling-other-services-with-hyper"><a class="header" href="#calling-other-services-with-hyper">Calling Other Services with Hyper</a></h1>
+<p>So far, we've used the Tower and Axum layers focusing on setting up routes,
+nesting services, and dependency injection. How about calling other web
+services?</p>
+<p>You can use <code>hyper</code> directly, but it is complicated---it supports just about
+everything you could ever want to do with HTTP. The <code>Reqwest</code> crate uses
+Hyper under the hood, but offers a much more friendly interface. So let's<br />
+add it to our program as a dependency:</p>
+<pre><code class="language-bash">cargo add reqwest -F json
+</code></pre>
+<p>Now we'll combine some of what we've learned to make a webserver with two routes and
+some shared state. A counter, incremented with the <code>/inc</code> route and a root (<code>/</code>) services
+that uses Reqwest to call the <code>/inc</code> service and display the current counter value.</p>
+<blockquote>
+<p>The code for this is in <code>code/hyer_client</code></p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use axum::{response::Html, routing::get, Router, Json};
+use axum::extract::State;
+use std::sync::Arc;
+use std::sync::atomic::AtomicUsize;
+
+struct Counter {
+    count: AtomicUsize,
+}
+
+#[tokio::main]
+async fn main() {
+    let counter = Arc::new(Counter {
+        count: AtomicUsize::new(0),
+    });
+
+    let app = Router::new()
+        .route("/", get(handler))
+        .route("/inc", get(increment))
+        .with_state(counter);
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn increment(State(counter): State&lt;Arc&lt;Counter&gt;&gt;) -&gt; Json&lt;usize&gt; {
+    println!("/inc service called");
+    let current_value = counter.count.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    Json(current_value)
+}
+
+async fn handler() -&gt; Html&lt;String&gt; {
+    println!("Sending GET request");
+    let current_count = reqwest::get("http://localhost:3001/inc")
+        .await
+        .unwrap()
+        .json::&lt;i32&gt;()
+        .await
+        .unwrap();
+
+    Html(format!("&lt;h1&gt;Remote Counter: {current_count} &lt;/h1&gt;"))
+}</code></pre></pre>
+<p>Congratulations! You can now call other REST services from within your REST service.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="returning-status-codes"><a class="header" href="#returning-status-codes">Returning Status Codes</a></h1>
+<p>So far, we've been lazy. We've handled errors with <code>unwrap</code> (which won't crash Axum!) and not
+used the HTTP status code system at all.</p>
+<p>Let's start rectifying that by learning how to return status codes from web handlers.</p>
+<blockquote>
+<p>The code for this is in <code>code/rest_service/status_codes</code></p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use axum::{routing::get, Router, http::StatusCode};
+
+#[tokio::main]
+async fn main() {
+    let app = Router::new().route("/", get(handler));
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn handler() -&gt; StatusCode {
+    StatusCode::SERVICE_UNAVAILABLE
+}</code></pre></pre>
+<p>You can simply return a <code>StatusCode</code> enumeration entry from a function to return that as the HTTP status code.
+This won't display a nice error message to the user - but for REST services it lets you indicate that something
+went wrong.</p>
+<blockquote>
+<p>It's worth thinking about how much information you want to return in your error messages, vs how much you log. You don't always want to reveal the inner workings of your system!</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="using-intoresponse"><a class="header" href="#using-intoresponse">Using IntoResponse</a></h1>
+<p>Now you've seen a bit of Axum's flexibility. You can inject dependencies, and return a variety of Response types---<code>Html()</code>, <code>Json()</code>, <code>StatusCode</code> etc.
+Understanding a little about how this works under the hood will help you write much more ergonomic code.</p>
+<p>All of the response types you've used implement an <code>IntoResponse</code> trait. That is, the <code>Response</code> type can be constructed from a wide variety
+of types.</p>
+<p>You can also take advantage of this. Your handlers can just return <code>impl IntoResponse</code> and infer the actual return type from the function
+body. This makes for quicker writing, but it isn't as obvious---so we've not used it thus far.</p>
+<p>For example, you can declare handlers like this:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn handler() -&gt; impl IntoResponse {
+    Html("&lt;h1&gt;Big text!&lt;/h1&gt;")
+}
+
+fn handler2() -&gt; impl IntoResponse {
+    Json(42)
+}
+<span class="boring">}</span></code></pre></pre>
+<p>That's not a huge win, but it does open up some possibilities.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="error-handling-with-intoresponse"><a class="header" href="#error-handling-with-intoresponse">Error Handling with IntoResponse</a></h1>
+<p>Axum's <code>IntoResponse</code> type includes a conversion from Rust's <code>Result</code> type. Returning an error response with a <code>Result</code> won't cause an unwrap and crash---it will cause Axum to return the type inside the error type.</p>
+<p><em>So why is that helpful?</em></p>
+<p>Now we can start to write handlers that use Rust's regular error-handling syntax, and fall back to a status code if something went wrong.</p>
+<h2 id="fallible-handlers-with-statuscode-fallback"><a class="header" href="#fallible-handlers-with-statuscode-fallback">Fallible Handlers with StatusCode Fallback</a></h2>
+<blockquote>
+<p>The code for this is in <code>code/rest_service/axum_error-handling</code>.</p>
+</blockquote>
+<p>Let's look at some example code:</p>
+<pre><pre class="playground"><code class="language-rust">use axum::{response::{Html, IntoResponse}, routing::get, Router, http::StatusCode, Json};
+
+#[tokio::main]
+async fn main() {
+    let app = Router::new()
+        .route("/html", get(html_handler))
+        .route("/json", get(json_handler))
+        .route("/error", get(error_handler));
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn html_handler() -&gt; Result&lt;impl IntoResponse, StatusCode&gt; {
+    Ok(Html("&lt;h1&gt;Hello, World!&lt;/h1&gt;"))
+}
+
+async fn json_handler() -&gt; Result&lt;impl IntoResponse, StatusCode&gt; {
+    Ok(Json(32))
+}
+
+async fn error_handler() -&gt; Result&lt;impl IntoResponse, StatusCode&gt; {
+    if 1 == 2 {
+        Ok(Html("&lt;h1&gt;Never happens&lt;/h1&gt;"))
+    } else {
+        Err(StatusCode::SERVICE_UNAVAILABLE)
+    }
+}</code></pre></pre>
+<p>All of our handlers now have the same return type:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>Result&lt;impl IntoResponse, StatusCode&gt;
+<span class="boring">}</span></code></pre></pre>
+<p>And now we're able to wrap our responses in the familiar Rust syntax for indicating whether a function succeeded or not:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>return Ok(Html("&lt;h1&gt;Hello, World!&lt;/h1&gt;"));
+return Err(StatusCode::SERVICE_UNAVAILABLE);
+<span class="boring">}</span></code></pre></pre>
+<p>We're most of the way there! Now how about handling the <code>?</code> operator for easy handling? We can't use a "naked" <code>?</code> unless we're calling a function that returns a <code>StatusCode</code>. But we can use <code>map_err</code> to handle errors:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn maybe_error() -&gt; Result&lt;impl IntoResponse, StatusCode&gt; {
+    let start = std::time::SystemTime::now();
+    let seconds_wrapped = start
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        .as_secs() % 3;
+    let divided = 100u64.checked_div(seconds_wrapped).ok_or(StatusCode::INTERNAL_SERVER_ERROR)?;
+    Ok(Json(divided))
+}
+<span class="boring">}</span></code></pre></pre>
+<p>This function obtains the current time, and transforms it into a Unix timestamp. Then we take the modulus with 3 --- so every 3 seconds the number will be 0. Then we perform a checked division---every 3 seconds, the service will fail.</p>
+<p>Notice that we're using <code>?</code> and <code>map_err</code>---just like we did in Rust Foundations.</p>
+<p>This allows you to write fluid Rust code, making use of Rust's error handling.</p>
+<h2 id="giving-more-detail"><a class="header" href="#giving-more-detail">Giving More Detail</a></h2>
+<p>But what if you want to display more detail in your error message? Axum let's you define <em>tuples</em> for your errors---containing various parts of the response (you can apply headers with <code>HeaderMap</code>, for example). Here's a simple example:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn maybe_error_verbose() -&gt; Result&lt;impl IntoResponse, (StatusCode, &amp;'static str)&gt; {
+    let start = std::time::SystemTime::now();
+    let seconds_wrapped = start
+        .duration_since(std::time::UNIX_EPOCH,)
+        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Time went backwards!"))?
+        .as_secs() % 3;
+    let divided = 100u64.checked_div(seconds_wrapped).ok_or((StatusCode::INTERNAL_SERVER_ERROR, "Division by zero"))?;
+    Ok(Json(divided))
+}
+<span class="boring">}</span></code></pre></pre>
+<p>You can replace <code>&amp;'static str</code> with <code>String</code> and use <code>format!</code> for more specific errors.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="quick-recap-on-nesting-making-calls-and-responses"><a class="header" href="#quick-recap-on-nesting-making-calls-and-responses">Quick Recap on Nesting, Making Calls and Responses</a></h1>
+<p>We're pretty deep into understanding the Axum/Hyper/Tower/Tokio stack now --- and you've got the tools required to:</p>
+<ul>
+<li>Build <code>Router</code> applications to offer content.</li>
+<li><code>Router</code> applications can offer state and <code>Extension</code> layers.</li>
+<li>Shared data with dependency injection and Rust's data-race protection.</li>
+<li>Nesting <code>Routers</code> to serve multi-tenant services.</li>
+<li>Calling <code>reqwest</code> to access other services.</li>
+<li>Using <code>IntoResponse</code> to clean up your handler return signatures.</li>
+<li>Combining <code>StatusCode</code>, <code>IntoResponse</code> and <code>map_err</code> for ergonomic error handling that hands out as much information as you want to the calling client as to why their call failed.</li>
+</ul>
+<p>That gives you a <em>lot</em> of flexibility. But we're not done yet. Let's dig into middleware and what it can do for us.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="serving-static-content-with-tower"><a class="header" href="#serving-static-content-with-tower">Serving Static Content with Tower</a></h1>
+<blockquote>
+<p>The code for this is in <code>code/rest_service/static_content</code>.</p>
+</blockquote>
+<p>We'll need to add a dependency for Tower itself and the Tower HTTP helper system:</p>
+<pre><code class="language-bash">cargo add tower -F util
+cargo add tower-http -F fs
+</code></pre>
+<p>The following code will provide a static handler that serves files in the <code>web</code> directory, if the filename exists and the provided URL was not already matched by a handler:</p>
+<pre><pre class="playground"><code class="language-rust">use axum::{response::{Html, IntoResponse}, routing::get, Router, http::StatusCode};
+use tower_http::services::ServeDir;
+
+#[tokio::main]
+async fn main() {
+    let app = Router::new()
+        .route("/static", get(static_handler))
+        .fallback_service(ServeDir::new("web"));
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn static_handler() -&gt; Result&lt;impl IntoResponse, StatusCode&gt; {
+    Ok(Html("&lt;h1&gt;Hello, World!&lt;/h1&gt;"))
+}</code></pre></pre>
+<p>To give it something to serve, in the <code>static_content</code> project directory we've added a directory named <code>web</code>. In that directory, there's a file named <code>demo.html</code>:</p>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;demo&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;demo&lt;/h1&gt;
+    &lt;p&gt;demo&lt;/p&gt;
+&lt;/html&gt;
+</code></pre>
+<p>Now test it by going to: <code>http://localhost:3001/demo.html</code> in a browser.</p>
+<h2 id="so-whats-happening-here"><a class="header" href="#so-whats-happening-here">So What's Happening Here?</a></h2>
+<p>Look at the router:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let app = Router::new()
+    .route("/static", get(static_handler))
+    .fallback_service(ServeDir::new("web"));
+<span class="boring">}</span></code></pre></pre>
+<p>Axum provides the concept of a "fallback service"---a service to try if none of the direct routes matched. We've attached <code>ServeDir</code>, which is a Tower middleware service defined in <code>tower_http</code>. That service receives the Hyper-formatted HTTP information about unhandled connections and tries to serve them.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="simple-header-based-authentication"><a class="header" href="#simple-header-based-authentication">Simple Header-Based Authentication</a></h1>
+<p>It's really common for REST services to require additional header information. Authentication is a classic case. Let's start by looking at what it takes to read header information inside a route handler.</p>
+<h2 id="accessing-headers-in-extractors"><a class="header" href="#accessing-headers-in-extractors">Accessing Headers in Extractors</a></h2>
+<blockquote>
+<p>The code is in <code>code/rest_service/axum_headers</code>.</p>
+</blockquote>
+<p>Here's a simple program that receives the headers for a get request:</p>
+<pre><pre class="playground"><code class="language-rust">use axum::{response::Html, routing::get, Router, http::HeaderMap};
+
+#[tokio::main]
+async fn main() {
+    let app = Router::new().route("/", get(header_handler));
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn header_handler(
+    headers: HeaderMap
+) -&gt; Html&lt;String&gt; {
+    if let Some(header) = headers.get("x-request-id") {
+        Html(format!("x-request-id: {}", header.to_str().unwrap()))
+    } else {
+        Html("x-request-id not found".to_string())
+    }
+}</code></pre></pre>
+<p>The <code>HeaderMap</code> extractor gives you full access to the headers without having to create your own handler type. In this case, if <code>x-request-id</code> is found --- we'll print it. If it isn't, we'll report that it isn't there.</p>
+<p>Of course, it won't be there in a regular browser call (run the program and visit <code>localhost:3001</code> to prove it).</p>
+<p>Let's write a function that submits a request with a header:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn make_request() {
+    // Pause to let the server start up
+    tokio::time::sleep(Duration::from_secs(1)).await;
+
+    // Make a request to the server
+    let response = reqwest::Client::new()
+        .get("http://localhost:3001/")
+        .header("x-request-id", "1234")
+        .send()
+        .await
+        .unwrap()
+        .text()
+        .await
+        .unwrap();
+    println!("{}", response);
+}
+<span class="boring">}</span></code></pre></pre>
+<p>And we'll call it just before we start serving:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>tokio::spawn(make_request());
+println!("listening on {}", listener.local_addr().unwrap());
+axum::serve(listener, app).await.unwrap();    
+<span class="boring">}</span></code></pre></pre>
+<p>Now the program starts, prints <code>x-request-id: 1234</code> and continues serving.</p>
+<p>You could easily transform this into an authentication system that checks for a header (presumably checking validity). The downside of this is that now all of your authenticated requests take a <code>HeaderMap</code> and have to remember to call the test. It works, but it's not super ergonomic. Let's fix that by writing our own middleware.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="simple-header-based-auth-with-middleware"><a class="header" href="#simple-header-based-auth-with-middleware">Simple Header-Based Auth with Middleware</a></h1>
+<p>Axum combines with Tower to let you build your own middleware---that is code that runs as part of the routing service, intercepting requests on their way in.</p>
+<blockquote>
+<p>The code for this is in <code>code/rest_service/axum_header_layer</code>.</p>
+</blockquote>
+<p>You can write middleware as a function:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn auth(
+    headers: HeaderMap,
+    req: Request,
+    next: Next,
+) -&gt; Result&lt;impl IntoResponse, (StatusCode, String)&gt; {    
+    if let Some(header) = headers.get("x-request-id") {
+        // Validate the header
+        if header.to_str().unwrap() != "1234" {
+            return Err((StatusCode::UNAUTHORIZED, "invalid header".to_string()));
+        }
+    }
+
+    Ok(next.run(req).await)
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Middleware functions accept extractors just like handler functions. In this case, we're extracing the headers. Returning an error stops subsequent layers from executing, and you can return an error. Alternatively, calling <code>next.run(req).await</code> passes control to the next handler in the chain.</p>
+<p>You register middleware for all layers in a <code>Router</code> as follows:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let app = Router::new()
+    .route("/", get(header_handler))
+    .route_layer(middleware::from_fn(auth));
+<span class="boring">}</span></code></pre></pre>
+<blockquote>
+<p>If you want different routes to use different middleware, you need to define multiple <code>Router</code>s and nest them.</p>
+</blockquote>
+<p>So here's an expanded version of the previous code. We're calling the API twice, once with a valid header and once without. We're using <code>println</code> to show that the handler never executes for the invalid header:</p>
+<pre><pre class="playground"><code class="language-rust">use std::time::Duration;
+use axum::{
+    http::{HeaderMap, StatusCode},
+    middleware::{Next, self},
+    response::{Html, IntoResponse},
+    routing::get,
+    Router, extract::Request,
+};
+
+#[tokio::main]
+async fn main() {
+    let app = Router::new()
+        .route("/", get(header_handler))
+        .route_layer(middleware::from_fn(auth));
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    tokio::spawn(make_request());
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn make_request() {
+    // Pause to let the server start up
+    tokio::time::sleep(Duration::from_secs(1)).await;
+
+    // Make a request to the server
+    let response = reqwest::Client::new()
+        .get("http://localhost:3001/")
+        .header("x-request-id", "1234")
+        .send()
+        .await
+        .unwrap()
+        .text()
+        .await
+        .unwrap();
+    println!("{}", response);
+
+    let response = reqwest::Client::new()
+        .get("http://localhost:3001/")
+        .header("x-request-id", "bad")
+        .send()
+        .await
+        .unwrap()
+        .text()
+        .await
+        .unwrap();
+    println!("{}", response);
+}
+
+async fn auth(
+    headers: HeaderMap,
+    req: Request,
+    next: Next,
+) -&gt; Result&lt;impl IntoResponse, (StatusCode, String)&gt; {    
+    // TODO: Fix this to not succeed when there isn't a header
+    if let Some(header) = headers.get("x-request-id") {
+        // Validate the header
+        if header.to_str().unwrap() == "1234" {
+            return Ok(next.run(req).await);
+        }
+    }
+
+    Err((StatusCode::UNAUTHORIZED, "invalid header".to_string()))
+}
+
+async fn header_handler(headers: HeaderMap) -&gt; Html&lt;String&gt; {
+    if let Some(header) = headers.get("x-request-id") {
+        Html(format!("x-request-id: {}", header.to_str().unwrap()))
+    } else {
+        Html("x-request-id not found".to_string())
+    }
+}</code></pre></pre>
+<p>That's an improvement---all authentication is now self-contained. It's still really messy to require that the handler <em>also</em> look at the headers and obtain the data. The good news is that we can fix that, too.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="middleware-auth-with-injection"><a class="header" href="#middleware-auth-with-injection">Middleware Auth with Injection</a></h1>
+<blockquote>
+<p>The code for this is in <code>code/rest_service/axum_header_layer</code>.</p>
+</blockquote>
+<p>You probably want your functions to be able to know about the authenticated user. If they aren't authenticated, you are handling that---but what about passing information about them to handlers? Middleware request functions can <em>inject</em> extension data into the pipeline:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn auth(
+    headers: HeaderMap,
+    mut req: Request,
+    next: Next,
+) -&gt; Result&lt;impl IntoResponse, (StatusCode, String)&gt; {    
+    if let Some(header) = headers.get("x-request-id") {
+        // Validate the header
+        let header = header.to_str().unwrap();
+        if header == "1234" {
+            req.extensions_mut().insert(AuthHeader { id: header.to_string() });
+            return Ok(next.run(req).await);                
+        }
+    }
+
+    Err((StatusCode::UNAUTHORIZED, "invalid header".to_string()))
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Making <code>req</code> mutable allows you to call <code>req.extensions_mut().insert</code> and add data to the request. Your handler can now retrieve that data:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn header_handler(
+    Extension(auth): Extension&lt;AuthHeader&gt;) -&gt; Html&lt;String&gt; {
+    Html(format!("x-request-id: {}", auth.id))
+}
+<span class="boring">}</span></code></pre></pre>
+<p>You don't <em>have</em> to request that extension---so a function that just needs to know if its authorized can work as-is. But if you need some additional information about the user, you can pass it along.</p>
+<blockquote>
+<p>You'd probably authenticate via a function and return a structure with more information!</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="selectively-applying-layers"><a class="header" href="#selectively-applying-layers">Selectively Applying Layers</a></h1>
+<p>You may not want to apply a layer across an entire service. Having to make a new nested router just for one handler to gain some functionality can get messy. Axum provides some flexibility.</p>
+<p>Functions for applying layers differently:</p>
+<ul>
+<li>You can apply a layer to a whole <code>Router</code> with <code>route_layer</code> and <code>.layer</code> in the router builder.</li>
+<li>You can annotate individual handlers with the <code>layer</code> command.</li>
+</ul>
+<p>Let's work through each of these, including learning how to procedurally route data based on the request.</p>
+<blockquote>
+<p>The code for this is in <code>code/axum_merge</code>.</p>
+</blockquote>
+<p>Here's a very simple example:</p>
+<pre><pre class="playground"><code class="language-rust">use axum::{response::Html, routing::get, Router};
+
+#[tokio::main]
+async fn main() {
+    let other = Router::new().route("/", get(handler2));
+    let app = Router::new().route("/", get(handler)).merge(other);
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn handler() -&gt; Html&lt;&amp;'static str&gt; {
+    Html("&lt;h1&gt;Hello, World!&lt;/h1&gt;")
+}
+
+async fn handler2() -&gt; Html&lt;&amp;'static str&gt; {
+    Html("&lt;h1&gt;Hello, World 2!&lt;/h1&gt;")
+}</code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="router-layers"><a class="header" href="#router-layers">Router Layers</a></h1>
+<p>You've already build a router-wide layer for authentication. Let's look at some of the pre-provided layer services and different ways of applying them.</p>
+<h2 id="providing-compression"><a class="header" href="#providing-compression">Providing Compression</a></h2>
+<p>Let's add <code>tower_http</code> with the feature <code>compression_full</code>:</p>
+<pre><code class="language-bash">cargo add tower_http -F compression_full
+</code></pre>
+<p>We'll also use a pre-canned file <code>war_and_peace.txt</code>---the entirety of War and Peace to demonstrate compression. Compression isn't very useful at all on tiny files, and the default <code>CompressionLayer</code> won't compress small responses (you can customize this with the <code>compress_when</code> function). So here's a complete webserver with compression enabled:</p>
+<blockquote>
+<p>The code is in <code>code/rest_service/axum_compression</code></p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use axum::{response::{Html, IntoResponse}, routing::get, Router};
+use tower_http::compression::CompressionLayer;
+
+#[tokio::main]
+async fn main() {
+
+    let app = Router::new()
+        .route("/", get(handler))
+        .layer(CompressionLayer::new());
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn handler() -&gt; impl IntoResponse {
+    const WAR_AND_PEACE: &amp;str = include_str!("war_and_peace.txt");
+    Html(WAR_AND_PEACE)
+}</code></pre></pre>
+<p>Open a browser and load <code>http://localhost:3001</code>. Now look in the developer tools Network pane, and you will see that the response is of type <code>br</code> - Brotli compression was used to minimize the file size.</p>
+<h2 id="combining-layers-into-a-service"><a class="header" href="#combining-layers-into-a-service">Combining Layers into a Service</a></h2>
+<p>If you need a lot of layers, you can combine them with the <code>ServiceBuilder</code>. Let's also use a <code>CorsLayer</code> (from <code>tower_http</code> - it requires the feature <code>cors</code>) and a <code>ConcurencyLimitLayer</code> (which requires <code>cargo add tower -F limits</code>):</p>
+<blockquote>
+<p>The code for this is in <code>code/rest_service/axum_service_builder</code></p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use axum::{response::{Html, IntoResponse}, routing::get, Router, http::Method};
+use tower::{ServiceBuilder, limit::ConcurrencyLimitLayer};
+use tower_http::{compression::CompressionLayer, cors::{CorsLayer, Any}};
+
+#[tokio::main]
+async fn main() {
+    let service = ServiceBuilder::new()
+        .layer(CompressionLayer::new())
+        .layer(
+            CorsLayer::new()
+                .allow_methods([Method::GET, Method::POST])
+        .       allow_origin(Any)
+        )
+        .layer(ConcurrencyLimitLayer::new(100));
+
+    let app = Router::new()
+        .route("/", get(handler))
+        .layer(service.into_inner());
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn handler() -&gt; impl IntoResponse {
+    const WAR_AND_PEACE: &amp;str = include_str!("../../axum_compression/src/war_and_peace.txt");
+    Html(WAR_AND_PEACE)
+}</code></pre></pre>
+<p>Tower and Tower_http provide a <em>lot</em> of useful layers. There are rate limiters, timeouts, load balancers, metrics, tracing. It's well worth diving into the documentation!</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="layer-recap"><a class="header" href="#layer-recap">Layer Recap</a></h1>
+<p>Now you've got a very capable REST stack:</p>
+<ul>
+<li>You can build <code>Router</code> applications.
+<ul>
+<li>You can nest multiple applications into a single server with <code>nest</code>.</li>
+<li>You can merge different application stacks together with <code>merge</code>.</li>
+</ul>
+</li>
+<li>You can share state inside <code>Router</code>s with <code>State</code> and extension layers.</li>
+<li>You can call <code>reqwest</code> to call other REST services.</li>
+<li>You can use <code>impl IntoResponse</code> to provide a consistent handler interface.</li>
+<li>You can return <code>(StatusCode, String)</code> to provide detailed errors.</li>
+<li>You can create your own middleware layers to intercept requests and dynamically inject dependencies.</li>
+<li>You can utilize the <code>tower</code> and <code>tower_http</code> services to add compression, timeouts, CORS, rate limits, concurrency limits, etc.</li>
+</ul>
+<p>In other words: you can build a very rich, powerful application with minimal boilerplate.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="tracing"><a class="header" href="#tracing">Tracing</a></h1>
+<p>You often need to store log data in your services. This can include error and warning messages, access to URLs, and performance data.</p>
+<p>We touched on this in the <em>Rust Foundations</em> class. Let's dig a bit more deeply into tracing a web service.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="minimal-example"><a class="header" href="#minimal-example">Minimal Example</a></h1>
+<p>Let's create a project:</p>
+<pre><code class="language-bash">cargo new axum_tracing
+cd axum_tracing
+cargo add tokio -F full
+cargo add axum
+cargo add tracing
+cargo add tracing_subscriber
+</code></pre>
+<p>And we'll paste in a tracing example:</p>
+<blockquote>
+<p>The code is in <code>code/tracing/axum_tracing_minimal</code>.</p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use axum::{response::Html, routing::get, Router};
+use tracing::info;
+
+#[tokio::main]
+async fn main() {
+    // Setup default tracing
+    tracing_subscriber::fmt::init();
+    info!("Starting server");
+    
+    let app = Router::new().route("/", get(handler));
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    info!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn handler() -&gt; Html&lt;&amp;'static str&gt; {
+    info!("Serving Hello World");
+    Html("&lt;h1&gt;Hello, World!&lt;/h1&gt;")
+}</code></pre></pre>
+<p>When you run this and visit the handler, you are greeted with various informational messages:</p>
+<pre><code>2024-01-15T17:09:08.415946Z  INFO axum_tracing_minimal: Starting server
+2024-01-15T17:09:08.416072Z  INFO axum_tracing_minimal: listening on 127.0.0.1:3001
+2024-01-15T17:10:10.327386Z  INFO axum_tracing_minimal: Serving Hello World
+</code></pre>
+<p>You can specify the output level with an environment variable, <code>RUST_LOG</code>:</p>
+<pre><code class="language-bash">RUST_LOG=error cargo run
+</code></pre>
+<p>Won't display anything, because we have no errors.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="logging-axumtower"><a class="header" href="#logging-axumtower">Logging Axum/Tower</a></h1>
+<p>Maybe we'd also like to log everything the webserver itself is doing (that can be a LOT of data). Let's add one more dependency:</p>
+<pre><code class="language-bash">cargo add tower_http -F trace
+</code></pre>
+<blockquote>
+<p>The code for this is in <code>code/tracing/axum_tracing_tower</code>.</p>
+</blockquote>
+<p>Then we have to add two lines of code:</p>
+<pre><pre class="playground"><code class="language-rust">use axum::{response::Html, routing::get, Router};
+use tower_http::trace::TraceLayer;
+use tracing::info;
+
+#[tokio::main]
+async fn main() {
+    // Setup default tracing
+    tracing_subscriber::fmt::init();
+    info!("Starting server");
+
+    let app = Router::new()
+        .route("/", get(handler))
+        .layer(TraceLayer::new_for_http());
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    info!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn handler() -&gt; Html&lt;&amp;'static str&gt; {
+    info!("Serving Hello World");
+    Html("&lt;h1&gt;Hello, World!&lt;/h1&gt;")
+}</code></pre></pre>
+<p>We've added <code>TraceLayer</code> and a <code>use tower_http::trace::TraceLayer</code> statement. Now if you run the program with <code>RUST_LOG=debug cargo run</code> you will see <em>everything</em>:</p>
+<pre><code>2024-01-15T17:45:34.191361Z  INFO axum_tracing_tower: Starting server
+2024-01-15T17:45:34.191526Z  INFO axum_tracing_tower: listening on 127.0.0.1:3001
+2024-01-15T17:45:38.054710Z DEBUG request{method=GET uri=/ version=HTTP/1.1}: tower_http::trace::on_request: started processing request
+2024-01-15T17:45:38.054756Z  INFO request{method=GET uri=/ version=HTTP/1.1}: axum_tracing_tower: Serving Hello World
+2024-01-15T17:45:38.054783Z DEBUG request{method=GET uri=/ version=HTTP/1.1}: tower_http::trace::on_response: finished processing request latency=0 ms status=200
+</code></pre>
+<blockquote>
+<p>Note that you can add <code>TraceLayer</code> to individual routers if you want to only log a specific portion of what's going on.</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="timing-spans"><a class="header" href="#timing-spans">Timing Spans</a></h1>
+<p>You saw in <em>Rust Foundations</em> that you can add spans to functions to track execution time. This continues to work inside Axum. It doesn't time the whole <code>request -&gt; layers -&gt; handler -&gt; layers -&gt; response</code> cycle---just your hanlder. For locating performance issues in your code, that can be just fine.</p>
+<p>Spans work as they did before:</p>
+<blockquote>
+<p>The code for this is in <code>code/tracing/axum_spans_own</code>.</p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use axum::{response::Html, routing::get, Router};
+use tower_http::trace::TraceLayer;
+use tracing::{info, instrument};
+use tracing_subscriber::fmt::format::FmtSpan;
+
+#[tokio::main]
+async fn main() {
+    // Setup tracing
+    let subscriber = tracing_subscriber::fmt()
+        // Use a more compact, abbreviated log format
+        .compact()
+        // Display source code file paths
+        .with_file(true)
+        // Display source code line numbers
+        .with_line_number(true)
+        // Display the thread ID an event was recorded on
+        .with_thread_ids(true)
+        // Don't display the event's target (module path)
+        .with_target(false)
+        // Include per-span timings
+        .with_span_events(FmtSpan::CLOSE)
+        // Build the subscriber
+        .finish();
+
+    // Set the subscriber as the default
+    tracing::subscriber::set_global_default(subscriber).unwrap();
+
+    info!("Starting server");
+
+    let app = Router::new()
+        .route("/", get(handler))
+        .layer(TraceLayer::new_for_http());
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    info!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+#[instrument]
+async fn handler() -&gt; Html&lt;&amp;'static str&gt; {
+    info!("Serving Hello World");
+    Html("&lt;h1&gt;Hello, World!&lt;/h1&gt;")
+}</code></pre></pre>
+<p>We've added span events to the tracing subscriber, and used <code>#[instrument]</code> to wrap our handler in a span. The server will now show you execution timings:</p>
+<pre><code>2024-01-16T20:37:34.281844Z  INFO ThreadId(01) axum_spans_own/src/main.rs:28: Starting server
+2024-01-16T20:37:34.281973Z  INFO ThreadId(01) axum_spans_own/src/main.rs:38: listening on 127.0.0.1:3001
+2024-01-16T20:37:37.201389Z  INFO ThreadId(21) handler: axum_spans_own/src/main.rs:44: Serving Hello World
+2024-01-16T20:37:37.201445Z  INFO ThreadId(21) handler: axum_spans_own/src/main.rs:42: close time.busy=60.9µs time.idle=12.6µs
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="axum-spans"><a class="header" href="#axum-spans">Axum Spans</a></h1>
+<p>You might want to trace the entirety of a trip through Axum, rather than instrumenting your own code. Unfortunately, this requires a bit of boilerplate.</p>
+<p>First of all, a working example:</p>
+<pre><pre class="playground"><code class="language-rust">use axum::{body::Body, http::Request, response::Html, routing::get, Router};
+use tower_http::trace::TraceLayer;
+use tracing::info;
+use tracing_subscriber::fmt::format::FmtSpan;
+
+#[tokio::main]
+async fn main() {
+    // Setup tracing
+    let subscriber = tracing_subscriber::fmt()
+        // Use a more compact, abbreviated log format
+        .compact()
+        // Display source code file paths
+        .with_file(true)
+        // Display source code line numbers
+        .with_line_number(true)
+        // Display the thread ID an event was recorded on
+        .with_thread_ids(true)
+        // Don't display the event's target (module path)
+        .with_target(false)
+        // Include per-span timings
+        .with_span_events(FmtSpan::CLOSE)
+        // Build the subscriber
+        .finish();
+
+    // Set the subscriber as the default
+    tracing::subscriber::set_global_default(subscriber).unwrap();
+
+    info!("Starting server");
+
+    let app =
+        Router::new()
+            .route("/", get(handler))
+            .layer(
+                TraceLayer::new_for_http().make_span_with(|request: &amp;Request&lt;Body&gt;| {
+                    let request_id = uuid::Uuid::new_v4();
+                    tracing::span!(
+                        tracing::Level::INFO,
+                        "request",
+                        method = tracing::field::display(request.method()),
+                        uri = tracing::field::display(request.uri()),
+                        version = tracing::field::debug(request.version()),
+                        request_id = tracing::field::display(request_id)
+                    )
+                }),
+            );
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    info!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn handler() -&gt; Html&lt;&amp;'static str&gt; {
+    info!("Serving Hello World");
+    Html("&lt;h1&gt;Hello, World!&lt;/h1&gt;")
+}</code></pre></pre>
+<p>When you run the server and connect to <code>http://localhost:3001</code>, you will see span messages for the <code>GET</code> request:</p>
+<pre><code>2024-01-16T20:48:48.444695Z  INFO ThreadId(01) axum_spans_own/src/main.rs:28: Starting server
+2024-01-16T20:48:48.444845Z  INFO ThreadId(01) axum_spans_own/src/main.rs:49: listening on 127.0.0.1:3001
+2024-01-16T20:48:50.355855Z  INFO ThreadId(21) request: axum_spans_own/src/main.rs:54: Serving Hello World method=GET uri=/ version=HTTP/1.1 request_id=9a3733b4-6f9c-4c39-9d29-c24abe577a83
+2024-01-16T20:48:50.355929Z  INFO ThreadId(21) request: axum_spans_own/src/main.rs:35: close time.busy=66.4µs time.idle=31.1µs method=GET uri=/ version=HTTP/1.1 request_id=9a3733b4-6f9c-4c39-9d29-c24abe577a83
+</code></pre>
+<p>So what are we doing differently?</p>
+<p>We've extended the <code>TraceLayer</code> to generate spans:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>.layer(
+    TraceLayer::new_for_http().make_span_with(|request: &amp;Request&lt;Body&gt;| {
+        let request_id = uuid::Uuid::new_v4();
+        tracing::span!(
+            tracing::Level::INFO,
+            "request",
+            method = tracing::field::display(request.method()),
+            uri = tracing::field::display(request.uri()),
+            version = tracing::field::debug(request.version()),
+            request_id = tracing::field::display(request_id)
+        )
+    }),
+);
+<span class="boring">}</span></code></pre></pre>
+<p>The <code>tracing</code> system doesn't generate its own unique IDs for requests, so we've added the UUID crate (<code>cargo add uuid -F v4</code>) for that purpose.</p>
+<blockquote>
+<p>Warning: generating random UUIDs isn't the fastest operation out there. Excessive tracing in this manner will slow your program down!</p>
+</blockquote>
+<p>Then we use the <code>span</code> macro from <code>tracing</code> to specify the details of what we're logging. You could read the <code>request</code> field to customize what gets emitted.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="logging-to-a-file"><a class="header" href="#logging-to-a-file">Logging to a File</a></h1>
+<p>Logging to <code>stdout</code> is often enough---if you are using <code>systemd</code> on Linux, it logs all of your standard output for you. But for larger systems, you probably want a more structured system.</p>
+<blockquote>
+<p>The code for this is in <code>code/tracing/trace_to_file</code></p>
+</blockquote>
+<p>The <code>tracing-appender</code> crate provides great log file management features. Add it with <code>cargo add -F tracing_appender</code>. Using it is really straightforward:</p>
+<pre><pre class="playground"><code class="language-rust">use tracing::info;
+
+fn main() {
+    // Setup tracing
+    let file_appender = tracing_appender::rolling::hourly("test.log", "prefix.log");
+    let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
+
+    tracing_subscriber::fmt()
+        .with_writer(non_blocking)
+        // Build the subscriber
+        .init();
+
+
+    info!("Starting server");
+}</code></pre></pre>
+<p>This combines with everything else you've learned about tracing---you can customize your subscriber, add layers, etc.</p>
+<p>By default this will roll the log file over every hour. <code>non_blocking</code> has the appender run in its own thread with a channel, and not block callers when logging---you don't have to wait for the disk.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="structured-logging-to-json"><a class="header" href="#structured-logging-to-json">Structured Logging to JSON</a></h1>
+<p>You might not want freeform text, and prefer to log to a structured layout such as JSON.</p>
+<blockquote>
+<p>The code for this is in <code>code/tracing/trace_to_json</code>.</p>
+</blockquote>
+<p>You can add <code>json</code> support to <code>tracing_subscriber</code> by adding the <code>json</code> feature:</p>
+<pre><code class="language-bash">cargo add tracing_subscriber -F json
+</code></pre>
+<p>Then you just add one line to your tracing initializer:</p>
+<pre><pre class="playground"><code class="language-rust">use tracing::info;
+
+fn main() {
+    // Setup tracing
+    let file_appender = tracing_appender::rolling::hourly("test.log", "prefix.log");
+    let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
+
+    tracing_subscriber::fmt()
+        .json()
+        .with_writer(non_blocking)
+        .init();
+
+    info!("Starting server");
+}</code></pre></pre>
+<p>And your log entries are now in JSON:</p>
+<pre><code class="language-json">{"timestamp":"2024-01-16T21:16:19.708837Z","level":"INFO","fields":{"message":"Starting server"},"target":"trace_to_json"}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="opentelemetry"><a class="header" href="#opentelemetry">OpenTelemetry</a></h1>
+<p>OpenTelemetry is becoming a standard for tracing distributed applications. The Axum stack supports it nicely.</p>
+<p>Let's get started by creating a Dockerized <code>SigNoz</code> server to gather and display OpenTelemetry data.</p>
+<p>The quick way to install it is to clone the GitHUb repo and run the install script to setup a Dockerized server:</p>
+<pre><code class="language-bash">git clone -b main https://github.com/SigNoz/signoz.git &amp;&amp; cd signoz/deploy/
+./install.sh
+</code></pre>
+<p>This can take a while, so I'm not going to make you watch! As they say on kids TV shows, "here's one I made earlier". You will see the following information dump:</p>
+<pre><code>++++++++++++++++++ SUCCESS ++++++++++++++++++++++
+
+🟢 Your installation is complete!
+
+🟢 Your frontend is running on http://localhost:3301
+
+ℹ️  By default, retention period is set to 15 days for logs and traces, and 30 days for metrics.
+To change this, navigate to the General tab on the Settings page of SigNoz UI. For more details, refer to https://signoz.io/docs/userguide/retention-period 
+
+ℹ️  To bring down SigNoz and clean volumes : sudo docker-compose -f ./docker/clickhouse-setup/docker-compose.yaml down -v
+</code></pre>
+<p>Go to <a href="http://localhost:3301/">http://localhost:3301/</a> in a browser to view the newly installed SigNoz OpenTelemetry system.</p>
+<p>The system is now listening for telemetry data on: <code>http://localhost:4317</code></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="hello-telemetry"><a class="header" href="#hello-telemetry">Hello Telemetry</a></h1>
+<p>Now let's build a simple web application and instrument it with OpenTelemetry.</p>
+<blockquote>
+<p>The code for this is in <code>code/tracing/otel_minimal</code></p>
+</blockquote>
+<p>Let's start a project:</p>
+<pre><code class="language-bash">cargo new otel_minimal
+cd otel_minimal
+</code></pre>
+<p>We need to set some dependencies. In <code>Cargo.toml</code>:</p>
+<pre><code class="language-toml">[dependencies]
+axum = "0.7.4"
+tokio = { version = "1.35.1", features = ["full"] }
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["registry", "env-filter"] }
+opentelemetry = { version = "0.21.0", features = ["metrics", "logs"] }
+opentelemetry_sdk = { version = "0.21.1", features = ["rt-tokio", "logs"] }
+opentelemetry-otlp = { version = "0.14.0", features = ["tonic", "metrics", "logs"]  }
+opentelemetry-semantic-conventions = { version = "0.13.0" }
+opentelemetry-http = "0.10.0"
+tracing-opentelemetry = "0.22.0"
+uuid = { version = "1.6.1", features = ["v4"] }
+tower-http = { version = "0.5.1", features = ["trace"] }
+</code></pre>
+<blockquote>
+<p>Thank you to <a href="https://apatisandor.hu/blog/production-ready-opentelemetry/">https://apatisandor.hu/blog/production-ready-opentelemetry/</a> for helping me with this!</p>
+</blockquote>
+<p>And here's the full code for the example:</p>
+<pre><pre class="playground"><code class="language-rust">use axum::{body::Body, http::Request, response::Html, routing::get, Router};
+use tower_http::trace::TraceLayer;
+use opentelemetry::{global, KeyValue, trace::TraceError, logs::LogError};
+use opentelemetry_otlp::{WithExportConfig, ExportConfig};
+use opentelemetry_sdk::{propagation::TraceContextPropagator, runtime, Resource, metrics::MeterProvider, logs::Config};
+use tracing::{info, instrument, level_filters::LevelFilter, Level};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use opentelemetry_sdk::trace as sdktrace; // To avoid name conflicts
+
+fn init_tracer(otlp_endpoint: &amp;str) -&gt; Result&lt;sdktrace::Tracer, TraceError&gt; {
+    opentelemetry_otlp::new_pipeline()
+        .tracing()
+        .with_exporter(
+            opentelemetry_otlp::new_exporter()
+                .tonic()
+                .with_endpoint(otlp_endpoint),
+        )
+        .with_trace_config(
+            sdktrace::config().with_resource(Resource::new(vec![KeyValue::new(
+                "service.name",
+                "hello_world",
+            )])),
+        )
+        .install_batch(runtime::Tokio)
+}
+
+fn init_metrics(otlp_endpoint: &amp;str) -&gt; opentelemetry::metrics::Result&lt;MeterProvider&gt; {
+    let export_config = ExportConfig {
+        endpoint: otlp_endpoint.to_string(),
+        ..ExportConfig::default()
+    };
+    opentelemetry_otlp::new_pipeline()
+        .metrics(runtime::Tokio)
+        .with_exporter(
+            opentelemetry_otlp::new_exporter()
+                .tonic()
+                .with_export_config(export_config),
+        )
+        .with_resource(Resource::new(vec![KeyValue::new(
+            opentelemetry_semantic_conventions::resource::SERVICE_NAME,
+            "hello_world",
+        )]))
+        .build()
+}
+
+fn init_logs(otlp_endpoint: &amp;str) -&gt; Result&lt;opentelemetry_sdk::logs::Logger, LogError&gt; {
+    opentelemetry_otlp::new_pipeline()
+        .logging()
+        .with_log_config(
+            Config::default().with_resource(Resource::new(vec![KeyValue::new(
+                opentelemetry_semantic_conventions::resource::SERVICE_NAME,
+                "hello_world",
+            )])),
+        )
+        .with_exporter(
+            opentelemetry_otlp::new_exporter()
+                .tonic()
+                .with_endpoint(otlp_endpoint.to_string()),
+        )
+        .install_batch(runtime::Tokio)
+}
+
+#[tokio::main]
+async fn main() {
+    global::set_text_map_propagator(TraceContextPropagator::new());
+
+    let otlp_endpoint = "http://localhost:4317";
+
+    let tracer = init_tracer(&amp;otlp_endpoint).unwrap();
+
+    let telemetry_layer = tracing_opentelemetry::layer().with_tracer(tracer);
+    let subscriber = tracing_subscriber::registry()
+        .with(LevelFilter::from_level(Level::DEBUG))
+        .with(telemetry_layer);
+
+    subscriber.init();
+
+    let _meter_provider = init_metrics(&amp;otlp_endpoint);
+    let _log_provider = init_logs(&amp;otlp_endpoint);
+
+    let app = Router::new()
+        .route("/", get(handler))
+        .layer(
+                TraceLayer::new_for_http().make_span_with(|request: &amp;Request&lt;Body&gt;| {
+                    let request_id = uuid::Uuid::new_v4();
+                    tracing::span!(
+                        tracing::Level::INFO,
+                        "request",
+                        method = tracing::field::display(request.method()),
+                        uri = tracing::field::display(request.uri()),
+                        version = tracing::field::debug(request.version()),
+                        request_id = tracing::field::display(request_id)
+                    )
+                }),
+            );
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+#[instrument(level = "info")]
+async fn handler() -&gt; Html&lt;&amp;'static str&gt; {
+    info!("Saying Hello");
+    Html("&lt;h1&gt;Hello, World!&lt;/h1&gt;")
+}</code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="openapi-documentation"><a class="header" href="#openapi-documentation">OpenAPI Documentation</a></h1>
+<p>You probably want to document your API, especially if you are sharing it with others. OpenAPI has become a de-facto standard for API documentation. Generating all of the description by hand would be tedious, so why not bake it into your service?</p>
+<p>You'll need to add a few dependencies:</p>
+<pre><code class="language-bash">cargo add tokio -F full # Tokio
+cargo add axum # The webserver
+cargo add serde -F derive # Needed for the JSON type
+cargo add utoipa
+cargo add utoipa-redoc -F axum # For redoc format
+cargo add utoipa-swagger-ui -F axum # It supports multiple webservers
+</code></pre>
+<p>The code for this is in <code>code/openapi/axum_openapi</code>.</p>
+<pre><pre class="playground"><code class="language-rust">use axum::{Json, routing::get, Router};
+use serde::Serialize;
+use utoipa::{OpenApi, ToSchema};
+use utoipa_swagger_ui::SwaggerUi;
+use utoipa_redoc::{Redoc, Servable};
+
+#[tokio::main]
+async fn main() {
+    #[derive(OpenApi)]
+    #[openapi(
+        paths(
+            handler,
+        ),
+        components(
+            schemas(HelloWorld)
+        ),
+        modifiers(),
+        tags(
+            (name = "Test System", description = "A really simple API")
+        )
+    )]
+    struct ApiDoc;
+
+    let app = Router::new()
+        .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
+        .merge(Redoc::with_url("/redoc", ApiDoc::openapi()))
+        .route("/", get(handler));
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+#[derive(Serialize, ToSchema)]
+struct HelloWorld {
+    message: String,
+}
+
+#[utoipa::path(
+    get,
+    path = "/",
+    responses(
+        (status = 200, description = "Say Hello to the World", body = [HelloWorld])
+    )
+)]
+async fn handler() -&gt; Json&lt;HelloWorld&gt; {
+    Json(
+        HelloWorld { message: "Hello, World!".to_string() }
+    )
+}</code></pre></pre>
+<p>Now you can run the program as normal. Open up <code>http://localhost:3001/swagger-ui/</code> and you have a fully formed Swagger UI defining your project.</p>
+<blockquote>
+<p>You absolutely should still use Rust Documentation as well!</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="handling-service-configuration"><a class="header" href="#handling-service-configuration">Handling Service Configuration</a></h1>
+<p>Configuration in a service-oriented environment can be quite complicated. Depending upon your setup, you may want to receive configuration from one or more of these targets:</p>
+<ul>
+<li><strong>Environment Variables</strong> --- particularly in Kubernetes and Docker based systems, passing configuration by environment variable is very common, often required.</li>
+<li><strong>Configuration Files</strong> --- you may want to read a configuration file and obtain settings from there.</li>
+<li><strong>HTTP</strong> --- some orchestration systems provide a unified configuration management setup, expecting your application to retrieve configuration over HTTP.</li>
+<li><strong>Command Line</strong> --- and you may just want to configure parts of your application from the command-line. If there is setup involved in bootstrapping your service (for example, adding first users to an authentication stack), you may even require support for this.</li>
+</ul>
+<p>On top of that, services need to be able to access their active configuration---both during setup, and at runtime. Just in case you weren't worried yet, you may also be hosting multiple services together in a modular monolith---and want them to each handle much of their own configuration!</p>
+<p>In this section, we're going to dive through many of the configuration options you have at your disposal.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="environment-variables-with-env"><a class="header" href="#environment-variables-with-env">Environment Variables with .env</a></h1>
+<p>Let's start with <code>.env</code> support. In Rust Foundations and other videos, we frequently used a <code>.env</code> file to store environment variables---and used the <code>dotnev</code> crate to load them. This remains a good practice, even if you won't use it on production; it provides a quick and easy way to tweak your setup, especially during development.</p>
+<blockquote>
+<p>The code for this may be found in <code>code/config/envfile</code>.</p>
+</blockquote>
+<p>Let's start a new project:</p>
+<pre><code class="language-bash">cargo new envfile
+cd envfile
+cargo add dotenvy
+</code></pre>
+<blockquote>
+<p>Note: we're using <code>dotenvy</code> because it has superceded <code>dotenv</code> in a lot of projects.</p>
+</blockquote>
+<p>Now let's make a program that reads a <code>.env</code> file, and outputs the contents of the <code>TESTVAR</code> environment variable:</p>
+<pre><pre class="playground"><code class="language-rust">fn main() {
+    // Ignore the result of loading .env --- it's ok if it doesn't exist
+    let _ = dotenvy::dotenv();
+
+    // Obtain the contents of the TESTVAR environment variable
+    let testvar = std::env::var("TESTVAR").unwrap_or_else(|_| "default".to_string());
+
+    // Print it
+    println!("{testvar}");
+}</code></pre></pre>
+<p>Now run this:</p>
+<pre><code class="language-bash">cargo run
+default
+TESTVAR=test cargo run
+test
+</code></pre>
+<p>You can create a file named <code>.env</code> in the project's root and set the variable there:</p>
+<pre><code>TESTVAR=test
+</code></pre>
+<p>Now you can <code>cargo run</code> and see the desired <code>test</code> value.</p>
+<p>That's not amazing, but it's a good start. You can pass environment variables into your program to use in configuration.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="the-config-crate"><a class="header" href="#the-config-crate">The Config Crate</a></h1>
+<p>A popular crate for managing configuration is the <code>config</code> crate. It supports all of the scenarios we listed in the introduction, and can provide for very flexible configuration. It is battle tested and widely used.</p>
+<p>The <code>config</code> crate supports reading configuration from a number of sources, and uses <code>serde</code> to map them into different formats.</p>
+<p>Let's start with a minimal test.</p>
+<blockquote>
+<p>The code for this is in <code>code/config/config_minimal</code>.</p>
+</blockquote>
+<p>We'll first make a project and add some dependencies:</p>
+<pre><code class="language-bash">cargo new config_minimal
+cd config_minimal
+cargo add dotenvy
+cargo add config
+</code></pre>
+<p>Now let's edit <code>main.rs</code> to read config from several sources:</p>
+<pre><pre class="playground"><code class="language-rust">use std::collections::HashMap;
+use config::Config;
+
+fn main() {
+    // Ignore the result of loading .env --- it's ok if it doesn't exist
+    let _ = dotenvy::dotenv();
+
+    let settings_reader = Config::builder()
+        .add_source(config::File::with_name("settings").required(false))
+        .add_source(config::Environment::with_prefix("APP"))
+        .build()
+        .unwrap();
+
+    let settings = settings_reader
+        .try_deserialize::&lt;HashMap&lt;String, String&gt;&gt;()
+        .unwrap();
+
+    println!("{settings:?}");
+}</code></pre></pre>
+<p>Now let's try running it a few ways.</p>
+<ul>
+<li><code>cargo run</code> on its own will print an empty set of settings: <code>{}</code></li>
+<li><code>TEST=test cargo run</code> will print <code>{}</code>. Environment variables are only loaded if they are prefixed with <code>APP_</code> - that's what our <code>with_prefix</code> does.</li>
+<li><code>APP_TEST=test cargo run</code> will print <code>{"test": "test"}</code></li>
+</ul>
+<p>Finally, let's add a file: <code>settings.toml</code>. We'll fill it out:</p>
+<pre><code class="language-toml">test="test"
+</code></pre>
+<p>And <code>cargo run</code> shows that it loaded the setting from the file: <code>{"test": "test"}</code></p>
+<p>You can mix and match. With the file still in place, try <code>APP_TEST2=test2 cargo run</code>---you will see <code>{"test": "test", "test2": "test2"}</code>.</p>
+<p>You can also override file settings with environment variables. If you <code>APP_TEST=foo cargo run</code> you will see <code>foo</code> not <code>test</code> as the output. Environment variables have precedence by default.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="loading-config-via-http"><a class="header" href="#loading-config-via-http">Loading Config via HTTP</a></h1>
+<p>HTTP configuration is a bit more complicated, because it will use an HTTP(s) source asynchronously. <code>Reqwest</code> isn't baked directly into <code>config</code>, so we have to provide a helper. This is very flexible because you can customize the request to match your requirements. It's also a bit more work.</p>
+<blockquote>
+<p>The code is in <code>code/config/config_http</code>.</p>
+</blockquote>
+<p>Let's create another project:</p>
+<pre><code class="language-bash">cargo new config_http
+cd config_http
+cargo add dotenvy
+cargo add config
+cargo add tokio -F full
+cargo add axum
+cargo add reqwest -F json
+cargo add async_trait
+</code></pre>
+<p>This example is a little larger:</p>
+<pre><pre class="playground"><code class="language-rust">use async_trait::async_trait;
+use axum::Router;
+use axum::routing::get;
+use config::{AsyncSource, Config, ConfigError, Format, Map, FileFormat};
+use std::collections::HashMap;
+use std::fmt::Debug;
+use std::time::Duration;
+
+#[tokio::main]
+async fn main() {
+    tokio::spawn(load_settings());
+    test_server().await;    
+}
+
+async fn test_server() {
+    // Fire up a minimal Axum server to provide some settings
+    let app = Router::new().route("/", get(|| async {
+        "test_setting = \"test\""
+    }));
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn load_settings() {
+    tokio::time::sleep(Duration::from_secs(1)).await;
+    // Ignore the result of loading .env --- it's ok if it doesn't exist
+    let _ = dotenvy::dotenv();
+
+    let settings_reader = Config::builder()
+        .add_source(config::File::with_name("settings").required(false))
+        .add_source(config::Environment::with_prefix("APP"))
+        .add_async_source(HttpSource {
+            uri: "http://localhost:3001/".into(),
+            format: FileFormat::Toml,
+        })
+        .build()
+        .await
+        .unwrap();
+
+    let settings = settings_reader
+        .try_deserialize::&lt;HashMap&lt;String, String&gt;&gt;()
+        .unwrap();
+
+    println!("{settings:?}");
+}
+
+#[derive(Debug)]
+struct HttpSource&lt;F: Format&gt; {
+    uri: String,
+    format: F,
+}
+
+#[async_trait]
+impl&lt;F: Format + Send + Sync + Debug&gt; AsyncSource for HttpSource&lt;F&gt; {
+    async fn collect(&amp;self) -&gt; Result&lt;Map&lt;String, config::Value&gt;, ConfigError&gt; {
+        reqwest::get(&amp;self.uri)
+            .await
+            .map_err(|e| ConfigError::Foreign(Box::new(e)))? // error conversion is possible from custom AsyncSource impls
+            .text()
+            .await
+            .map_err(|e| ConfigError::Foreign(Box::new(e)))
+            .and_then(|text| {
+                self.format
+                    .parse(Some(&amp;self.uri), &amp;text)
+                    .map_err(ConfigError::Foreign)
+            })
+    }
+}</code></pre></pre>
+<p>There's three parts to this program:</p>
+<ul>
+<li>The <code>test_server</code> function runs an HTTP server, so the demo has a source of configuration data. You normally don't need this.</li>
+<li>The <code>load_settings</code> function is what you need as a client. It's relatively straightforward---you've added an async source.</li>
+<li>The <code>HttpSource</code> system would have to be customized to work with your configuration file source, which is why it isn't baked into <code>Config</code>. You can write this once, share it as a library for your services.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="cli-configuration-with-clap"><a class="header" href="#cli-configuration-with-clap">CLI configuration with Clap</a></h1>
+<p>In the <em>Rust Foundations</em> class, we used <code>clap</code> for command-line parsing. We'll do that again, but lets use the produral rather than derive-based system for defining arguments.</p>
+<p>We want to add a command <code>serve</code>, with optional port and address parameters---and use that to launch the webserver. We're deliberately leaving room for other commands, so that if services need to provide commands (for configuration, setup, etc.) they can.</p>
+<p>Here's a working example. Let's work through it:</p>
+<blockquote>
+<p>The code is in <code>code/config/config_clap</code>.</p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use axum::{response::Html, routing::get, Router};
+use clap::{value_parser, Arg, Command};
+
+#[tokio::main]
+async fn main() {
+    let matches = Command::new("simple_http_server")
+        .version("0.1.0")
+        .author("Herbert")
+        .subcommand(
+            Command::new("serve")
+                .about("Starts the server")
+                .arg(
+                    Arg::new("address")
+                        .short('a')
+                        .long("address")
+                        .value_name("ADDRESS")
+                        .help("Sets the IP address to bind to"),
+                )
+                .arg(
+                    Arg::new("port")
+                        .short('p')
+                        .long("port")
+                        .value_name("PORT")
+                        .help("Sets the port to bind to")
+                        .value_parser(value_parser!(u16)),
+                ),
+        )
+        .get_matches();
+
+    if let Some(matches) = matches.subcommand_matches("serve") {
+        let address: String = matches
+            .get_one("address")
+            .cloned()
+            .unwrap_or("127.0.0.1".to_string());
+        let port: u16 = *matches.get_one("port").unwrap_or(&amp;3001);
+        let bind_address = format!("{}:{}", address, port);
+        serve(&amp;bind_address).await;
+    } else {
+        println!("Run with --help for details");
+    }
+}
+
+async fn serve(bind_address: &amp;str) {
+    let app = Router::new().route("/", get(handler));
+
+    let listener = tokio::net::TcpListener::bind(bind_address).await.unwrap();
+
+    println!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn handler() -&gt; Html&lt;&amp;'static str&gt; {
+    Html("&lt;h1&gt;Hello, World!&lt;/h1&gt;")
+}</code></pre></pre>
+<p>You can run this with <code>cargo run</code>, and it outputs instructions to run with <code>--help</code> for information. Running <code>cargo run -- --help</code> displays the help text. <code>cargo run -- serve</code> starts the webserver on the default address and port. You can then override these with <code>cargo run -- serve -p 3002 -a 0.0.0.0</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="configuration-recap"><a class="header" href="#configuration-recap">Configuration Recap</a></h1>
+<p>So far, we've:</p>
+<ul>
+<li>Used the <code>dotenvy</code> crate to load environment variables from <code>.env</code> files. This is optional, but really useful for configuring test environments.</li>
+<li>Used <code>Config</code> to load configuration from environment variables, files and network sources.</li>
+<li>Used <code>clap</code> to handle CLI configuration of the service.</li>
+</ul>
+<p>That's all the building blocks you need. We'll revisit this a bit when we get to the service design section.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="grpc"><a class="header" href="#grpc">gRPC</a></h1>
+<p>Many REST APIs look a lot like remote procedure calls (RPC): you call a function remotely, process the response, and treat it like a regular function call. The only difference being that the function executes elsewhere.</p>
+<p>Writing a full <code>Reqwest</code> handler and sharing data types works---but it's laborious. It's even more laborious when you want to handle clients running other languages.</p>
+<p>Google invented <code>gRPC</code> for this use-case. <code>gRPC</code> uses <code>protobuf</code> to define protocols, and provides some automatic framework creation. Rust isn't on the officially blessed list of languages yet, but the Tokio team have built <code>tonic</code> to help.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="hello-tonic"><a class="header" href="#hello-tonic">Hello Tonic</a></h1>
+<p>Tonic can automate a lot of the pain of building a service, and the provision of protobuf protocol files can serve as a level of automatic documentation. gRPC hasn't received as much attention as regular REST, but it's an option to consider.</p>
+<p>Let's start by building a new project:</p>
+<pre><code>cargo new hello_tonic
+cd hello_tonic
+</code></pre>
+<p>Next, we'll define our protocol:</p>
+<pre><code>mkdir proto
+touch proto/hello.proto
+</code></pre>
+<p>Now edit <code>hello.proto</code>:</p>
+<pre><code class="language-proto">syntax = "proto3";
+package hello;
+
+service Greeter {
+    rpc SayHello (HelloRequest) returns (HelloReply);
+}
+
+message HelloRequest {
+   string name = 1;
+}
+
+message HelloReply {
+    string message = 1;
+}
+</code></pre>
+<p>In this file, we're defining our <em>protocol</em>:</p>
+<ul>
+<li><code>syntax = "proto3"</code> defines the file as using version 3 of the ProtoBuf format.</li>
+<li><code>package hello</code> names your package. This name is important: the compiler will use it as the compiled output name.</li>
+<li><code>service</code> allows you to define a service.</li>
+<li><code>rpc SayHello</code> defines a remote procedure call named <code>SayHello</code>. We define that it requires a request, and returns a reply.</li>
+<li>The <code>message</code> sections allow us to define each of the data types we are using.</li>
+</ul>
+<p>Congratulations - you've defined your first protocol.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="hello-tonic---project-definition"><a class="header" href="#hello-tonic---project-definition">Hello Tonic - Project Definition</a></h1>
+<p>We're going to take advantage of a Rust trick to define two binaries in one project. That way, inside one project we can build both the server and the client---and output two different binaries.</p>
+<p>You don't <em>strictly</em> need to do this, but it's convenient for keeping the code together. It also lets you learn a handy Rust trick!</p>
+<p>Edit your project's <code>Cargo.toml</code>:</p>
+<pre><code class="language-toml">[package]
+name = "hello_tonic"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]] # Bin to run the HelloWorld gRPC server
+name = "helloworld-server"
+path = "src/server.rs"
+
+[[bin]] # Bin to run the HelloWorld gRPC client
+name = "helloworld-client"
+path = "src/client.rs"
+
+[dependencies]
+tonic = "0.10"
+prost = "0.12"
+tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
+
+[build-dependencies]
+tonic-build = "0.10"
+</code></pre>
+<p>You've specified multiple <code>[[bin]]</code> sections, allowing you to name programs and replace <code>main.rs</code> with named files for each program.</p>
+<p>You've also specified some dependencies:</p>
+<ul>
+<li><code>tonic</code> is the gRPC server/client itself.</li>
+<li><code>prost</code> is a Protobuf compiler that converts <code>proto</code> files to Rust.</li>
+<li><code>tokio</code> provides the underlying async setup.</li>
+</ul>
+<p>You've also got a <em>build-dependency</em>---it won't be in the main program, but will be required when you build your program.</p>
+<h2 id="buildrs"><a class="header" href="#buildrs">Build.rs</a></h2>
+<p>Now let's add a <code>build.rs</code> file. It goes in the same folder as your <code>Cargo.toml</code> file - <strong>not in src</strong>. <code>build.rs</code> is a special file that is invoked before compilation occurs, you can use it to perform pre-build tasks.</p>
+<p>Our <code>build.rs</code> file is quite simple:</p>
+<pre><pre class="playground"><code class="language-rust">fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    tonic_build::compile_protos("proto/hello.proto")?;
+    Ok(())
+}</code></pre></pre>
+<p>The file calls <code>tonic_build</code> and tells it to compile our protobuf file.</p>
+<p>If you build your project now, deep inside your <code>target</code> directory the protobuf file is compiled into a <code>hello.rs</code> file. It's quite intimidating. Here's just a snippet:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct HelloRequest {
+    #[prost(string, tag = "1")]
+    pub name: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct HelloReply {
+    #[prost(string, tag = "1")]
+    pub message: ::prost::alloc::string::String,
+}
+/// Generated client implementations.
+pub mod greeter_client {
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    use tonic::codegen::*;
+    use tonic::codegen::http::Uri;
+    #[derive(Debug, Clone)]
+    pub struct GreeterClient&lt;T&gt; {
+        inner: tonic::client::Grpc&lt;T&gt;,
+    }
+    impl GreeterClient&lt;tonic::transport::Channel&gt; {
+<span class="boring">}</span></code></pre></pre>
+<p>Prost and the builder have implemented an entire Rust system! Your messages are implemented as Rust structures, connected to the Tonic system. If you keep scrolling, there's a complete async reactor service in there! Good thing you didn't have to type that...</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="hello-tonic---the-server"><a class="header" href="#hello-tonic---the-server">Hello Tonic - The Server</a></h1>
+<p>Rename your <code>main.rs</code> file to <code>server.rs</code>. This is where we'll build the server.</p>
+<p>Start with some imports:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use tonic::{transport::Server, Request, Response, Status};
+<span class="boring">}</span></code></pre></pre>
+<p>Next, we'll create a module and include the entire auto-generated protocol file in it:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub mod hello_world {
+    tonic::include_proto!("hello");
+}
+<span class="boring">}</span></code></pre></pre>
+<p>All of the code you didn't have to write is now in <code>hello_world::&lt;foo&gt;</code>! We need a few of the defined functions, so let's <code>use</code> them:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use hello_world::greeter_server::{Greeter, GreeterServer};
+use hello_world::{HelloReply, HelloRequest};
+<span class="boring">}</span></code></pre></pre>
+<p>We're importing the <code>Greeter</code> service and server, and the message types we defined. Tonic does a bit of trait magic, providing your server definitions as traits. So we have to implement our own structure and implement a trait to make our server do something:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Debug, Default)]
+pub struct MyGreeter {}
+
+#[tonic::async_trait]
+impl Greeter for MyGreeter {
+    async fn say_hello(
+        &amp;self,
+        request: Request&lt;HelloRequest&gt;,
+    ) -&gt; Result&lt;Response&lt;HelloReply&gt;, Status&gt; {
+        println!("Got a request: {:?}", request);
+
+        let reply = hello_world::HelloReply {
+            message: format!("Hello {}!", request.into_inner().name).into(),
+        };
+
+        Ok(Response::new(reply))
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>In this case, we print out that we received a request, format a reply and send it right back. The last thing to do is write a <code>main</code> function and start the server:</p>
+<pre><pre class="playground"><code class="language-rust">#[tokio::main]
+async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    let addr = "[::1]:50051".parse()?;
+    let greeter = MyGreeter::default();
+
+    Server::builder()
+        .add_service(GreeterServer::new(greeter))
+        .serve(addr)
+        .await?;
+
+    Ok(())
+}</code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="hello-tonic---the-client"><a class="header" href="#hello-tonic---the-client">Hello Tonic - The Client</a></h1>
+<p>The client starts in the same way: we import our generated code, and use some of it:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub mod hello_world {
+    tonic::include_proto!("hello");
+}
+
+use hello_world::greeter_client::GreeterClient;
+use hello_world::HelloRequest;
+<span class="boring">}</span></code></pre></pre>
+<p>Then we make a Tokio main function, and call the client:</p>
+<pre><pre class="playground"><code class="language-rust">#[tokio::main]
+async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    let mut client = GreeterClient::connect("http://[::1]:50051").await?;
+
+    let request = tonic::Request::new(HelloRequest {
+        name: "Tonic".into(),
+    });
+
+    let response = client.say_hello(request).await?;
+
+    println!("RESPONSE={:?}", response);
+
+    Ok(())
+}</code></pre></pre>
+<p>Let's test it!</p>
+<ol>
+<li>In one window, run <code>cargo run --bin helloworld-server</code>.</li>
+<li>In a second window, run <code>cargo run --bin helloworld-client</code>.</li>
+</ol>
+<p>The server will show:</p>
+<pre><code>Got a request: Request { metadata: MetadataMap { headers: {"te": "trailers", "content-type": "application/grpc", "user-agent": "tonic/0.10.2"} }, message: HelloRequest { name: "Tonic" }, extensions: Extensions }
+</code></pre>
+<p>The client will show:</p>
+<pre><code>RESPONSE=Response { metadata: MetadataMap { headers: {"content-type": "application/grpc", "date": "Tue, 30 Jan 2024 19:56:42 GMT", "grpc-status": "0"} }, message: HelloReply { message: "Hello Tonic!" }, extensions: Extensions }
+</code></pre>
+<p>It's a little more involved than just building a REST server, but it's fast, efficient---and you can quickly generate clients for many languages.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="grpc-streaming"><a class="header" href="#grpc-streaming">gRPC Streaming</a></h1>
+<p>REST requests tend to be distinct: you send a request and get a response. You <em>can</em> implement streaming in HTTP, but it tends to get complicated.</p>
+<p>gRPC lets you abstract a <em>stream</em> over a reusable client, and interact with it like you would a Rust async channel. If you think back to <em>Rust Foundations</em>, you can treat streams like an iterator: progressively sending more and more data until the task is done. When the stream is done, the channel closes---and the recipient doesn't receive any more messages.</p>
+<p>Let's make a new project:</p>
+<pre><code class="language-bash">cargo new tonic_stream
+cd tonic_stream
+</code></pre>
+<p>And edit our <code>Cargo.toml</code> to include both a client and server, and some dependencies. We've added one more: <code>tokio_stream</code>:</p>
+<pre><code class="language-toml">[package]
+name = "tonic_stream"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]] # Bin to run the HelloWorld gRPC server
+name = "streaming-server"
+path = "src/server.rs"
+
+[[bin]] # Bin to run the HelloWorld gRPC client
+name = "streaming-client"
+path = "src/client.rs"
+
+[dependencies]
+tonic = "0.10"
+prost = "0.12"
+tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
+tokio-stream = "0.1.14"
+
+[build-dependencies]
+tonic-build = "0.10"
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="grpc-streaming---protocol-definition"><a class="header" href="#grpc-streaming---protocol-definition">gRPC Streaming - Protocol Definition</a></h1>
+<p>Next, we define the protocol again:</p>
+<pre><code class="language-bash">mkdir proto
+touch streaming.proto
+</code></pre>
+<p>And we fill in the protocol:</p>
+<pre><code class="language-proto">syntax = "proto3";
+
+package streaming;
+
+service streaming {
+    rpc Squares(Start) returns (stream Square);
+}
+
+message Start {
+    int32 n = 1;
+}
+
+message Square {
+    int32 n = 1;
+}
+</code></pre>
+<p>Notice that we're returning <code>stream Square</code>---we're going to stream the results.</p>
+<p>Let's also put our <code>build.rs</code> in place to compile the protocol:</p>
+<pre><pre class="playground"><code class="language-rust">fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    tonic_build::compile_protos("proto/streaming.proto")?;
+    Ok(())
+}</code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="grpc-streaming---the-server"><a class="header" href="#grpc-streaming---the-server">gRPC Streaming - The Server</a></h1>
+<p>Rename <code>main.rs</code> to <code>server.rs</code>. We'll start by including some types we will use:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use tonic::{transport::Server, Request, Response, Status};
+use tokio_stream::wrappers::ReceiverStream;
+<span class="boring">}</span></code></pre></pre>
+<p>Next, we include our generated code and the types it created for the server:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub mod streaming {
+    tonic::include_proto!("streaming");
+}
+use streaming::streaming_server::{ Streaming, StreamingServer};
+use streaming::{Start, Square};
+<span class="boring">}</span></code></pre></pre>
+<p>Now we define our streaming service type:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Debug, Default)]
+pub struct StreamingService {}
+<span class="boring">}</span></code></pre></pre>
+<p>Next, we implement the <code>Streaming</code> trait Tonic generated to match our protocol.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[tonic::async_trait]
+impl Streaming for StreamingService {
+    type SquaresStream = ReceiverStream&lt;Result&lt;Square, Status&gt;&gt;;
+
+    async fn squares(&amp;self, request: Request&lt;Start&gt;) -&gt; Result&lt;Response&lt;Self::SquaresStream&gt;, Status&gt; {
+        println!("Got a request: {:?}", request);
+        let (tx, rx) = tokio::sync::mpsc::channel(4);
+
+        tokio::spawn(async move {
+            for i in 0..request.into_inner().n {
+                let square = Square {
+                    n: i * i,
+                };
+                tx.send(Ok(square)).await.unwrap();
+            }
+        });
+
+        Ok(Response::new(ReceiverStream::new(rx)))
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Notice that we've defined a local type: <code>SquaresStream</code>. The <code>ReceiverStream</code> syntax is really unwieldy, so let's not type it over and over. The <code>squares</code> function receives a request, and returns a <code>SquaresStream</code>---wrapped in a <code>Result</code> in case anything goes wrong.</p>
+<p>We then create a channel, just like in <em>Rust Foundations</em>. We spawn an async task---this will run independently. We then send the receiver part of the channel back to the client.</p>
+<p>Inside the spawned task, we use the regular channel syntax to submit results.</p>
+<p>Finally, we need to actually start the server in our <code>main</code> function:</p>
+<pre><pre class="playground"><code class="language-rust">#[tokio::main]
+async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    let addr = "[::1]:10000".parse().unwrap();
+    println!("Square Server listening on: {}", addr);
+
+    let streamer = StreamingService {};
+    let svc = StreamingServer::new(streamer);
+    Server::builder().add_service(svc).serve(addr).await?;
+
+    Ok(())
+}</code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="grpc-streaming---the-client"><a class="header" href="#grpc-streaming---the-client">gRPC Streaming - The Client</a></h1>
+<p>This follows a similar pattern:</p>
+<pre><pre class="playground"><code class="language-rust">use streaming::{streaming_client::StreamingClient, Start};
+
+pub mod streaming {
+    tonic::include_proto!("streaming");
+}
+
+#[tokio::main]
+async fn main() {
+    let mut client = StreamingClient::connect("http://[::1]:10000").await.unwrap();
+    for n in 1..10 {
+        println!("Requesting squares up to {}", n);
+        let request = tonic::Request::new(Start { n });
+        let mut stream = client.squares(request).await.unwrap().into_inner();
+        while let Some(result) = stream.message().await.unwrap() {
+            println!("RESULT={:?}", result);
+        }
+    }
+}</code></pre></pre>
+<p>We include our protocol, and then call it---and treat the results exactly like a normal channel.</p>
+<p>You can test this by:</p>
+<ul>
+<li>In one window, run <code>cargo run --bin streaming-server</code></li>
+<li>In a second window, run <code>cargo run --bin streaming-client</code></li>
+</ul>
+<p>Even in debug mode, it's very fast! You are maintaining one HTTP connection, rather than spawning a new one for each command.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="recap-so-far"><a class="header" href="#recap-so-far">Recap So Far</a></h1>
+<p>So far, you've learned to:</p>
+<ul>
+<li>Define your protocol in a protobuf file.</li>
+<li>Automatically turn the protobuf file into Rust.</li>
+<li>Write a server and client that use it.</li>
+<li>Stream data using channels across client-server boundaries.</li>
+</ul>
+<p>Now for a word of warning: Tonic is quite new, and is developing fast. Using the more advanced features is a bit rough-and-ready while it catches up to Axum-like usability.</p>
+<p>Refer to <a href="https://github.com/hyperium/tonic/tree/master/examples">https://github.com/hyperium/tonic/tree/master/examples</a> for <em>many</em> examples of what you can do with Tonic as it is.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="authentication"><a class="header" href="#authentication">Authentication</a></h1>
+<p>Some authentication systems are built-in to the gRPC standard, and may be used through Tonic. And just like Axum, you can add layers to handle authentication.</p>
+<p>Let's go back to our <code>hello world</code> example and add some authentication.</p>
+<blockquote>
+<p>The code for this is in <code>code/grpc/tonic_auth</code>.</p>
+</blockquote>
+<p>We can add server-side authentication by adding a function:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn check_auth(req: Request&lt;()&gt;) -&gt; Result&lt;Request&lt;()&gt;, Status&gt; {
+    use tonic::metadata::MetadataValue;
+    let token: MetadataValue&lt;_&gt; = "Bearer some-secret-token".parse().unwrap();
+
+    match req.metadata().get("authorization") {
+        Some(t) if token == t =&gt; Ok(req),
+        _ =&gt; Err(Status::unauthenticated("No valid auth token")),
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>So we're requiring that the client provide some meta-data containing a secret token. If it isn't present, we'll return an error and a status code.</p>
+<p>We also need to adjust our service main to use it:</p>
+<pre><pre class="playground"><code class="language-rust">#[tokio::main]
+async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    let addr = "[::1]:50051".parse()?;
+    let greeter = MyGreeter::default();
+
+    let svc = GreeterServer::with_interceptor(greeter, check_auth);
+
+    Server::builder()
+        .add_service(svc)
+        .serve(addr)
+        .await?;
+
+    Ok(())
+}</code></pre></pre>
+<p>We've added an <em>interceptor</em>---which receives requests before the actual handler. This is just like using layers in Axum/Tower.</p>
+<p>Now run the client unmodified:</p>
+<ol>
+<li>Run the server with <code>cargo run --bin auth-server</code></li>
+<li>Run the client with <code>cargo run --bin auth-client</code></li>
+</ol>
+<p>You will receive an error code:</p>
+<pre><code>Error: Status { code: Unauthenticated, message: "No valid auth token", metadata: MetadataMap { headers: {"content-type": "application/grpc", "date": "Tue, 30 Jan 2024 21:25:27 GMT", "content-length": "0"} }, source: None }
+</code></pre>
+<p>That's great if all you want to do is deny requests! How do we have the client perform authentication?</p>
+<p>Here's the modified client:</p>
+<pre><pre class="playground"><code class="language-rust">pub mod hello_world {
+    tonic::include_proto!("tonic_auth");
+}
+
+use tonic::metadata::MetadataValue;
+use tonic::transport::Channel;
+use tonic::Request;
+use crate::hello_world::greeter_client::GreeterClient;
+use crate::hello_world::HelloRequest;
+
+#[tokio::main]
+async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    // Build the client as a channel with a token and interceptor
+    let channel = Channel::from_static("http://[::1]:50051")
+        .connect()
+        .await?;
+    let token: MetadataValue&lt;_&gt; = "Bearer some-secret-token".parse()?;
+    let mut client = GreeterClient::with_interceptor(channel, move |mut req: Request&lt;()&gt;| {
+        req.metadata_mut().insert("authorization", token.clone());
+        Ok(req)
+    });
+
+    // Using the client remains unchanged
+    let request = tonic::Request::new(HelloRequest {
+        name: "Tonic".into(),
+    });
+
+    let response = client.say_hello(request).await?;
+
+    println!("RESPONSE={:?}", response);
+
+    Ok(())
+}</code></pre></pre>
+<p>We've replaced <code>let mut client = GreeterClient::connect("http://[::1]:50051").await?;</code> with a more complicated connection scheme:</p>
+<ul>
+<li>We create a channel to represent the connection.</li>
+<li>We create the token.</li>
+<li>We create the <code>GreeterClient</code> with an interceptor that adds the authentication to the request.</li>
+</ul>
+<p>Running the client now succeeds.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="tracing-1"><a class="header" href="#tracing-1">Tracing</a></h1>
+<p>Everything you know about Tracing still applies! Include <code>tracing</code> in your server or client, and start emitting log entries and spans. Include <code>tracing_subscriber</code> to output your results.</p>
+<p>Let's modify our hello world server to include some tracing.</p>
+<blockquote>
+<p>The code for this is in <code>code/grpc/tonic_tracing</code></p>
+</blockquote>
+<p>We'll need to add some dependencies:</p>
+<pre><code class="language-bash">cargo add tracing
+cargo add tracing-subscriber
+</code></pre>
+<p>Now in <code>server.rs</code>, we can add a timing span to our function:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[tracing::instrument]
+    async fn say_hello(
+<span class="boring">}</span></code></pre></pre>
+<p>And in <code>main</code>, we need to activate tracing. I've forced it to <code>DEBUG</code> level to show a LOT of messages:</p>
+<pre><pre class="playground"><code class="language-rust">#[tokio::main]
+async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    // Setup tracing
+    let subscriber = tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::DEBUG)
+        // Use a more compact, abbreviated log format
+        .compact()
+        // Display source code file paths
+        .with_file(true)
+        // Display source code line numbers
+        .with_line_number(true)
+        // Display the thread ID an event was recorded on
+        .with_thread_ids(true)
+        // Don't display the event's target (module path)
+        .with_target(false)
+        // Include per-span timings
+        .with_span_events(FmtSpan::CLOSE)
+        // Build the subscriber
+        .finish();
+
+    // Set the subscriber as the default
+    tracing::subscriber::set_global_default(subscriber).unwrap();
+
+    let addr = "[::1]:50051".parse()?;
+    let greeter = MyGreeter::default();
+
+    Server::builder()
+        .trace_fn(|_| tracing::info_span!("hello_server"))
+        .add_service(GreeterServer::new(greeter))
+        .serve(addr)
+        .await?;
+
+    Ok(())
+}</code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="when-to-use-grpc"><a class="header" href="#when-to-use-grpc">When to use gRPC</a></h1>
+<p>gRPC is a powerful alternative to regular REST (you can even have both in the same server). gRPC makes the most sense when your remote function calls look like a program: you initiate one connection, ask the other side to do things - acting as if the remote party is local - and eventually conclude the conversation.</p>
+<p>REST meanwhile, is more request oriented. You send a request of some sort, and receive a reply. You can do this over and over. REST is also more suited to browser-based endpoints.</p>
+<p>gRPC is very fast, and the protobuf system makes for nice protocol documentation. It's also not as widely adopted as REST.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="web-sockets"><a class="header" href="#web-sockets">Web Sockets</a></h1>
+<p>Sometimes you want a connection that's more like a regular TCP connection. As you saw in Rust Foundations, this can offer significant performance and bandwidth advantages. It's also a little irritating to write in that you are building a complete protocol from scratch.</p>
+<p>gRPC offers a good middle-ground: you reuse your connection, the protocol is largely implemented for you, and it's relatively painless.</p>
+<p>Sometimes, though, you need to stream a large amount of data to a client and would like a bit more control over the protocol. This is where WebSockets come in handy, especially for large volumes of data to be displayed in a browser.</p>
+<p>Axum has WebSocket support baked in, but it's quite unlike regular REST requests.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="minimal-echo-server"><a class="header" href="#minimal-echo-server">Minimal Echo Server</a></h1>
+<p>Let's create a project:</p>
+<pre><code class="language-bash">cargo new ws_echo
+cd ws_echo
+cargo add axum -F ws
+cargo add tokio -F full
+</code></pre>
+<p>And here's a working server:</p>
+<blockquote>
+<p>The code is in <code>code/wss/wss_echo</code>.</p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use axum::{
+    extract::{ws::WebSocket, WebSocketUpgrade},
+    response::{Html, IntoResponse},
+    routing::get,
+    Router,
+};
+
+#[tokio::main]
+async fn main() {
+    let app = Router::new()
+        .route("/ws", get(ws_handler))
+        .route("/", get(site));
+
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn site() -&gt; Html&lt;&amp;'static str&gt; {
+    const BODY: &amp;str = include_str!("echo.html");
+    Html(BODY)
+}
+
+async fn ws_handler(ws: WebSocketUpgrade) -&gt; impl IntoResponse {
+    ws.on_upgrade(move |sock| handle_socket(sock))
+}
+
+async fn handle_socket(mut socket: WebSocket) {
+    while let Some(Ok(msg)) = socket.recv().await {
+        println!("Got message: {}", msg.to_text().unwrap());
+        socket.send(msg).await.unwrap();
+    }
+}</code></pre></pre>
+<p>Let's go through the functions:</p>
+<ul>
+<li><code>main</code> is a typical async main function, and sets up an Axum router as we have before.</li>
+<li><code>site</code> returns a static HTML page from <code>echo.html</code>. The page is compiled into the binary using <code>include_str</code>.</li>
+</ul>
+<p>The two websocket functions as <code>ws_handler</code> and <code>handle_socket</code>. Browser-based websockets are opened with a small dance:</p>
+<ol>
+<li>The browser gets the web-socket url (<code>ws://localhost:3001/ws</code>) in this case.</li>
+<li>The server accepts the connection and offers websocket negotiation.</li>
+<li>The browser opens a websocket with an "upgrade" call.</li>
+</ol>
+<p>The <code>ws_handler</code> function receives the request for a websocket, and binds a function to <code>on_upgrade</code> - when the client upgrades to an actual websocket connection, an async task will be spawned with the passed function.</p>
+<p>So <code>ws_handler</code> <em>indirectly</em> calls <code>handle_socket</code>---it won't activate until the socket is running.</p>
+<p>Inside <code>handle_socket</code>, you can see how websockets work from the server perspective. A websocket isn't quite a raw TCP connection---it automatically wraps each transmission in a "message" (so there's no need to handle size negotiations in your protocol). This allows Axum to send you messages as a stream. When the socket closes, the stream closes - and the function's <code>while let</code> will stop. In this case, the function then stops.</p>
+<p>This is a <em>really</em> powerful and fast mechanism. You can have gRPC style streaming while just using a webserver/browser.</p>
+<p>Here's the HTML page:</p>
+<pre><code class="language-html">&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;WebSocket Echo Client&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;input type="text" id="message" value="Hello, world!"&gt;
+    &lt;input type="button" id="send" value="Send"&gt;
+
+    &lt;script&gt;
+        var ws = new WebSocket("ws://localhost:3001/ws");
+        ws.onopen = function() {
+            console.log("onopen");
+        };
+        ws.onmessage = function(e) {
+            console.log("onmessage: " + e.data);
+        };
+        ws.onclose = function() {
+            console.log("onclose");
+        };
+        ws.onerror = function(e) {
+            console.log("onerror: " + e.data);
+        };
+
+        document.getElementById("send").onclick = function() {
+            var message = document.getElementById("message").value;
+            ws.send(message);
+        };
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>Try this out: go to <code>http://localhost:3001</code>. Open the debug console, and you can see an "onopen" message indicating that the socket opened. Submit some text, and it will be echoed back.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="a-native-ws-client"><a class="header" href="#a-native-ws-client">A native WS client</a></h1>
+<p>Axum is using a library called "Tungstenite" behind the scenes for websocket handling. Tungstenite also includes a client. We'll use the same server as we did for the last example, so start that running.</p>
+<blockquote>
+<p>The code for this is in <code>code/wss/ws_client</code>.</p>
+</blockquote>
+<p>Let's start with a new project and some dependencies:</p>
+<pre><code class="language-bash">cargo new ws_client
+cd ws_client
+cargo add tokio -F full
+cargo add futures_util # We're using this for stream helpers
+cargo add tokio-tungstenite
+</code></pre>
+<p>Then the code is very much like working with a regular stream:</p>
+<pre><pre class="playground"><code class="language-rust">use futures_util::{SinkExt, StreamExt};
+use tokio_tungstenite::tungstenite::Message;
+
+#[tokio::main]
+async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    let (mut ws_stream, _) = tokio_tungstenite::connect_async("ws://localhost:3001/ws").await?;
+    let message = Message::Text("Hello".to_string());
+    ws_stream.send(message).await?;
+
+    while let Some(msg) = ws_stream.next().await {
+        let msg = msg?;
+        println!("Received: {}", msg);
+    }
+
+    Ok(())
+}</code></pre></pre>
+<p>Run this to connect to our echo server, and it will send "Hello" --- and receive the same. You'll have to <code>ctrl-C</code> to exit, we didn't include a bail-out system!</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="json"><a class="header" href="#json">JSON</a></h1>
+<p>We've sent and received plain text, which is often enough. But what if we want to stream some structured data in JSON, for example to update some telemetry at a high rate?</p>
+<p>The code for this is in <code>code/wss/ws_json</code>.</p>
+<p>Let's start by creating a project and dependencies:</p>
+<pre><code class="language-bash">cargo new ws_json
+cd ws_json
+cargo add tokio -F full
+cargo add axum -F ws
+cargo add serde -F derive
+cargo add serde_json
+</code></pre>
+<p>Now we'll build a server. It's very similar to the echo example, but we've added strongly typed JSON:</p>
+<pre><pre class="playground"><code class="language-rust">use axum::{
+    extract::{ws::WebSocket, WebSocketUpgrade},
+    response::{Html, IntoResponse},
+    routing::get,
+    Router,
+};
+use serde::{Deserialize, Serialize};
+
+#[tokio::main]
+async fn main() {
+    let app = Router::new()
+        .route("/ws", get(ws_handler))
+        .route("/", get(site));
+
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
+        .await
+        .unwrap();
+    axum::serve(listener, app).await.unwrap();
+}
+
+#[derive(Serialize, Deserialize)]
+enum Request {
+    NextPoint,
+    Quit
+}
+
+#[derive(Serialize, Deserialize)]
+struct Point {
+    x: f32,
+    y: f32,
+}
+
+async fn site() -&gt; Html&lt;&amp;'static str&gt; {
+    const BODY: &amp;str = include_str!("json.html");
+    Html(BODY)
+}
+
+async fn ws_handler(ws: WebSocketUpgrade) -&gt; impl IntoResponse {
+    ws.on_upgrade(move |sock| handle_socket(sock))
+}
+
+async fn handle_socket(mut socket: WebSocket) {
+    let mut tick = 0.0f32;
+    while let Some(Ok(msg)) = socket.recv().await {
+        let text = msg.to_text().unwrap();
+        let req: Request = serde_json::from_str(text).unwrap();
+        match req {
+            Request::NextPoint =&gt; {
+                let response = Point {
+                    x: tick.cos() * (tick / 10.0),
+                    y: tick.sin() * (tick / 10.0),
+                };
+                let response = serde_json::to_string(&amp;response).unwrap();
+                socket.send(response.into()).await.unwrap();
+
+                tick += 0.01;
+                if tick &gt; 4_000.0 {
+                    tick = 0.0;
+                }
+            }
+            Request::Quit =&gt; {
+                break;
+            }
+        }
+    }
+}</code></pre></pre>
+<p>Notice how we:</p>
+<ul>
+<li>Use Serde's <code>Serialize</code> and <code>Deserialize</code> to make our two data-types serializable.</li>
+<li>Setup a request/response format.</li>
+<li>When we receive a message, we deserialize it ourselves.</li>
+<li>We maintain state within the <code>handle_socket</code> function. Each function runs independently---so the state is <em>local</em> to a connection. If we connect twice, each will run the full cycle.</li>
+<li>Quitting is as simple as breaking out of the handler loop, which will drop the socket.</li>
+</ul>
+<p>The client side (<code>json.html</code>) is a bit complicated, so let's cut and paste it:</p>
+<pre><code class="language-html">&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;WebSocket Echo Client&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;canvas id="myCanvas" width="600" height="600"&gt;&lt;/canvas&gt;
+    &lt;div id="counter"&gt;&lt;/div&gt;
+
+    &lt;script&gt;
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext("2d");
+        const requestNext = { NextPoint : null };
+        const start = Date.now();
+        let red = 0;
+        let iterations = 0;
+
+        var ws = new WebSocket("ws://localhost:3001/ws");
+        ws.onopen = function() {
+            console.log("onopen");
+            ws.send(JSON.stringify(requestNext));
+        };
+        ws.onmessage = function(e) {
+            let message = JSON.parse(e.data);
+            // Move to the center
+            message.x += 300;
+            message.y += 300;
+            ctx.fillStyle = "rgb(" + red + ", 0, 0)";
+            red += 1;
+            red %= 255;
+            ctx.fillRect(message.x, message.y, 1, 1);
+            iterations += 1;
+            document.getElementById("counter").innerHTML = iterations;
+
+            if (iterations &lt; 200000) {
+                ws.send(JSON.stringify(requestNext));
+            } else {
+                const end = Date.now();
+                const time = end - start;
+                const speed = iterations / time;
+                document.getElementById("counter").innerHTML = "Iterations: " + iterations + " Time: " + time + " Speed: " + speed.toFixed(2) + " points/ms";
+                ws.send(JSON.stringify({ Quit : null }));
+            }
+        };
+        ws.onclose = function() {
+            console.log("onclose");
+        };
+        ws.onerror = function(e) {
+            console.log("onerror: " + e.data);
+        };
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>Go to <a href="http://localhost:3001">http://localhost:3001</a> and see. Great performance! And more importantly, all 200,000 requests have used a single TCP stream---and a single header. Once the socket is running, it's very low overhead.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="service-deployment"><a class="header" href="#service-deployment">Service Deployment</a></h1>
+<p>In this section, we're going to talk about different ways to deploy your Rust services. We won't dive into Kubernetes---let's leave that for the subject experts. We will discuss:</p>
+<div class="table-wrapper"><table><thead><tr><th>Deployment Type</th><th>Description</th><th>Comment</th></tr></thead><tbody>
+<tr><td>Direct to OS</td><td>Installed on a host with an OS, no virtualization</td><td>The fastest without also writing an operating system</td></tr>
+<tr><td>Direct to VM</td><td>Installed on a host that is running a virtual machine system. Installed inside a VM on the VM system.</td><td>VMs impose overhead, so not as fast as native. Depending upon your VM system, your VM may now be relocatable.</td></tr>
+<tr><td>Docker</td><td>Docker, either on a physical host or a VM</td><td>Docker takes the overhead of the parent system (physical host or VM), and adds a little more as it runs inside a container (or a VM on Windows/Mac).</td></tr>
+<tr><td>Docker Compose</td><td>Multiple Docker Images</td><td>Same as Docker</td></tr>
+</tbody></table>
+</div>
+<p>If you're using Rust for its high-performance and low-overhead, there are definite benefits to running as close to the metal as possible. Conversely, there are management benefits from virtualizing and/or containerizing. As with many things in IT, it's a trade-off. I can't give you the right answer for your needs!</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="build-a-test-service"><a class="header" href="#build-a-test-service">Build a Test Service</a></h1>
+<p>We'll quickly put together a test service for deployment.</p>
+<p>Go through the code - we'll look at it in detail later. Notice:</p>
+<ul>
+<li>It loads configuration from environment variables.</li>
+<li>We have <code>.env</code> set to mock the environment variables for testing.</li>
+<li>There's an <code>auth</code> and <code>bookstore</code> service.
+<ul>
+<li>Both have their own configuration.</li>
+<li>Both have their own databases. We used a "new type" to differentiate between the database pools.</li>
+<li>Each has a secure section using a layer for token-based security.</li>
+</ul>
+</li>
+<li>The <code>static_html</code> directory is an HTML+Javascript application.</li>
+</ul>
+<p>The important part is that the executable is self-contained, other than <em>also</em> requiring a <code>static_html</code> directory.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="native-host-deployment"><a class="header" href="#native-host-deployment">Native Host Deployment</a></h1>
+<p>Deploying natively is very easy:</p>
+<ol>
+<li>Build the site in <code>release</code> mode.
+<ul>
+<li><code>cargo build --release</code></li>
+</ul>
+</li>
+<li>Copy <code>deploy_bookstore</code> to your target folder.</li>
+<li>Copy the <code>static_html</code> directory into the target folder.</li>
+</ol>
+<p>You can now run <code>./deploy_bookstore</code>. On Linux, you can use <code>systemd</code> to make it into a service if you wish.</p>
+<p>You don't need any dependencies or runtimes: all dependencies are baked into the executable.</p>
+<p>Native deployment is also the highest performing option. The same steps apply to "native" inside a VM.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="docker-deployment"><a class="header" href="#docker-deployment">Docker Deployment</a></h1>
+<blockquote>
+<p>Make sure you have Docker and the Docker Desktop tools installed! A working example is in <code>/no_workspace/deploy_bookstore</code>. It's not in a workspace---but it could be, you'd have to change the path to <code>Cargo.lock</code>.</p>
+</blockquote>
+<p>In the source folder for your project, type:</p>
+<pre><code class="language-bash">docker init
+</code></pre>
+<ol>
+<li>Select "Rust" (the default).</li>
+<li>Select the default unless you need a specific version of Rust.</li>
+<li>We listen on port 3001, but it's configurable. Let's choose 3002.</li>
+</ol>
+<p>We still need to tell Docker that it should include the <code>static_html</code> content, and have a place to store the SqLite data files. We can edit <code>Dockerfile</code>, and change the second stage:</p>
+<pre><code>ARG UID=10001
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
+    appuser
+RUN mkdir -p /db &amp;&amp; chown -R appuser /db
+USER appuser
+
+# Copy the executable from the "build" stage.
+COPY --from=build /bin/server /bin/
+COPY static_html /bin/static_html
+
+# Expose the port that the application listens on.
+EXPOSE 3002
+
+# What the container should run when it is started.
+CMD ["/bin/server"]
+</code></pre>
+<p>Finally, we need to edit <code>compose.yaml</code> to include the environment variables and persist <code>/db</code> between runs:</p>
+<pre><code>services:
+  server:
+    build:
+      context: .
+      target: final
+    ports:
+      - 3002:3002
+    environment:
+      - APP_LISTEN_ADDRESS=0.0.0.0
+      - APP_LISTEN_PORT=3002
+      - APP_STATIC_CONTENT=/bin/static_html
+      - AUTH_DB_FILENAME=/db/auth.db
+      - BOOKSTORE_DB_FILENAME=/db/bookstore.db
+    volumes:
+      - db:/db
+volumes:
+  db:
+</code></pre>
+<p>Now you can run your program with <code>docker compose up</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="service-design"><a class="header" href="#service-design">Service Design</a></h1>
+<p>Designing a service architecture is a <em>big</em> topic (Bill teaches a great design philosophy oriented class, much of which is applicable to Rust).</p>
+<p>There's several layers to service design:</p>
+<ul>
+<li>Designing Individual Services.
+<ul>
+<li>Module and Crate Structure.</li>
+<li>Writing for Clarity.</li>
+<li>Tailoring Your Design to Your Team.</li>
+<li>Flexibility.</li>
+<li>API stability.</li>
+</ul>
+</li>
+<li>Service Architecture.
+<ul>
+<li>Monolith.</li>
+<li>Modular Monolith.</li>
+<li>Microservices.</li>
+<li>Nanoservices.</li>
+<li>Designing for YOUR need AND your cost structure.</li>
+</ul>
+</li>
+<li>Maintainability.</li>
+<li>Observability.</li>
+</ul>
+<p>This section is more philosophical and less code, but we'll look at some practical examples along the way.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="understanding-your-company-architecture"><a class="header" href="#understanding-your-company-architecture">Understanding Your Company Architecture</a></h1>
+<p>We've talked (and will keep talking) about your <em>program architecture</em>, but it's important not to miss the big picture. Your company also has an architecture, and your service(s) need to work for the company.</p>
+<p>For example, adopting microservices is often a <em>political</em> not a <em>technical</em> decision. If your company is large enough that you have many teams who take responsibility over individual parts of your service architecture---and need the flexibility to deploy independently of one another---breaking your system up into team-sized chunks can make sense from a <em>political</em> perspective. Some of the original arguments for microservices included "overcoming fiefdoms" (a single IT group saying "this is ours"), scoping devops (so the developers can also be systems administrators, DBAs, etc.), keeping meetings to reasonable durations (not everyone has to discuss <em>everything</em>). Behind those, come arguments for scalability and resilience.</p>
+<p>It's also really important to be realistic. If you're just starting out with a small team of plucky developers, and have 1-2 customers---there's a good chance you can build a monolith that runs the entire project on a $6-25/month Digital Ocean droplet. That's what LibreQoS did to get started! There are all manner of stories of "we built a huge Kubernetes architecture, with redundant servers on each coast. We were READY for web-scale --- and unfortunately, our 3 customers didn't pay enough to keep us afloat."</p>
+<p>It's sadly less common to hear tales of "we launched and had a million customers in a week. Our infrastructure just couldn't keep up, and we failed because we couldn't scale". It does happen---but it's rare.</p>
+<p>At the next level, if you're working for an established enterprise---you need to fit within whatever company architecture they are demanding. So make sure you understand what's expected, and tailor your solutions to fit the need.</p>
+<p>And it's possible that you're working for an established "web scale" enterprise, and picked Rust because you need to replace a massive volume service with something highly performant, stable and safe. Once again, you need to work with what your enterprise demands.</p>
+<p>Let's consider some <em>company architecture</em> decisions:</p>
+<div class="table-wrapper"><table><thead><tr><th>Company</th><th>Description</th><th>Needs</th><th>Goal</th></tr></thead><tbody>
+<tr><td>Sole Developer</td><td>It's just you, you want to have fun and not get burned out by GitHub requests</td><td>Keep it Simple! Scale may not be the top priority, but avoiding spaghetti is.</td><td>Modular Monolith</td></tr>
+<tr><td>Small Startup</td><td>You're just getting going and don't have many customers yet</td><td>Keep costs low. Keep it simple. Scale isn't a priority now, but you hope it will be. Telemetry.</td><td>Modular Monolith</td></tr>
+<tr><td>Rapidly Expanding</td><td>You've got customers and need to scale to fit demand.</td><td>Telemetry, understand the pain points. Code that supports adding developers.</td><td>Modular Monolith that can be divided</td></tr>
+<tr><td>Webscale!</td><td>You've made it! You're supporting Google-style load, and heating data-centers around the world.</td><td>Telemetry, Manageability, Supporting Diverse Teams</td><td>Readily divided services</td></tr>
+</tbody></table>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="designing-individual-services"><a class="header" href="#designing-individual-services">Designing Individual Services</a></h1>
+<p>In this section we're going to talk about the design of individual services.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="service-layout"><a class="header" href="#service-layout">Service Layout</a></h1>
+<p>Picking a good structure up-front can save you from hours of painful refactoring (although Rust makes refactoring easy!). Many of the same guidelines apply at all scales.</p>
+<h2 id="module-vs-crate"><a class="header" href="#module-vs-crate">Module vs Crate</a></h2>
+<p>An individual service should be either a module (<code>mod my_service</code> pointing at a directory) or a crate (<code>cargo new my_service</code> and include the service in your dependencies). As it grows, you may want to break the service into <em>multiple</em> crates both for compile time and for ease of integration.</p>
+<p>We'll talk about modules---but remember, you can scale them out as needed into crates.</p>
+<h2 id="basic-layout"><a class="header" href="#basic-layout">Basic Layout</a></h2>
+<p>In the <code>no_workspace/deploy_bookstore</code> example, we've got two services: <code>auth</code> and <code>bookstore</code>. Each is self-contained inside a module---and could easily become one or more separate crates if that module needs to be isolated (for political or scaling purposes). There's also some static HTML.</p>
+<p>So the basic layout of the program is:</p>
+<pre><code>-- src
+    -- auth
+    -- bookstore
+    -- static_html
+</code></pre>
+<p>The goal here is to allow each of the modules to be self-contained with very little coupling to other services.</p>
+<p>And then inside each of the service modules, you'll find a layout like this:</p>
+<pre><code>-- auth
+    -- migrations (containing SQLX database migrations)
+    -- db (containing the data layer)
+    -- configuration (per-service configuration)
+    -- web_service (Axum specific code)
+    mod.rs -- exposes a "setup service" function that returns a Router
+</code></pre>
+<p>The <code>auth</code> module also includes an <code>auth_layers</code> module---which is shared with other components. We'll talk about that in a bit.</p>
+<p>Here's the full <code>setup_service</code> function for <code>auth</code>:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub async fn setup_service() -&gt; Result&lt;Router&gt; {
+    let config = configuration::AuthConfiguration::load()?;
+    let db_pool = db::get_connection_pool(&amp;config.db_filename).await?;
+
+    db::perform_migrations(db_pool.clone()).await?;
+
+    let secure_router = Router::new()
+        .route("/users", get(web_service::list_users))
+        .route("/users/:id", get(web_service::get_user))
+        .route("/users/delete/:id", get(web_service::delete_user))
+        .route("/users/add", post(web_service::add_user))
+        .route("/users/update/:id", post(web_service::update_user))
+        .layer(Extension(config.clone()))
+        .layer(Extension(db_pool.clone()))
+        .route_layer(middleware::from_fn(auth_layers::require_token));
+
+    let router = Router::new()
+        .route("/login", post(web_service::do_login))
+        .nest("/", secure_router)
+        .layer(Extension(config))
+        .layer(Extension(db_pool));
+
+    Ok(router)
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Let's walk through this:</p>
+<ol>
+<li>We use a <code>Result</code> type to ensure we can communicate errors to the parent system.</li>
+<li>We load per-service configuration.</li>
+<li>We initialize our database connection pool.</li>
+<li>We perform any migrations (be careful with this in production!)</li>
+<li>We build a <code>secure_router</code> layer that attaches the configuration, database pool, and a <code>require_token</code> middleware layer.</li>
+<li>We build a router with publicly available routes, and also inject configuration and the database pool.</li>
+<li>We return the router.</li>
+</ol>
+<p>What <em>isn't</em> here? We don't initialize Axum, start listening to the network. That will be handled at the top-level---allowing us to easily host a multi-tenant service architecture.</p>
+<p>We've designed the beginnings of a modular monolith.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="per-service-configuration"><a class="header" href="#per-service-configuration">Per-Service Configuration</a></h1>
+<p>The <code>auth</code> service has its own configuration. This is very common: most services will have configurable items, and you want to offer flexibility when running the program. The <code>auth</code> service configuration is very simple:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct AuthConfiguration {
+    pub db_filename: String,
+}
+<span class="boring">}</span></code></pre></pre>
+<blockquote>
+<p>Note that since we're using SQLite files, we just have a filename here. In reality, you've probably got one or more connection strings.</p>
+</blockquote>
+<p>We also wrap loading the configuration into an associated method---a constructor:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>impl AuthConfiguration {
+    pub fn load() -&gt; Result&lt;Self&gt; {
+        // Load any .env files
+        // Ignore the result of loading .env --- it's ok if it doesn't exist
+        let _ = dotenvy::dotenv();
+
+        let settings_reader = Config::builder()
+            .add_source(config::File::with_name("settings").required(false))
+            .add_source(config::Environment::with_prefix("AUTH"))
+            .build()?;
+
+        let settings = settings_reader
+            .try_deserialize()?;
+
+        Ok(settings)
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>This is more-or-less boilerplate---it'll be the same for most services. We:</p>
+<ol>
+<li>Load any <code>.env</code> files.</li>
+<li>Use the <code>Config</code> crate to optionally load a settings file, and apply any settings from environment variables prefixed with <code>AUTH_</code>. In this case, <code>AUTH_DB_FILENAME</code>.</li>
+<li>We deserialize into a strongly typed settings type. If essential configuration items are missing or malformed, the whole process will bail out with an error telling you "Missing db_filename" or similar. Give your environment clues as to what broke!</li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="per-service-database"><a class="header" href="#per-service-database">Per-Service Database</a></h1>
+<p>Not every service will <em>have</em> a database---you might use files, just perform computations. A <em>lot</em> of services will, so it's worth mentioning.</p>
+<p>Some guidelines:</p>
+<ul>
+<li>Start by dividing your database into a separate module.</li>
+<li>Expose an API for the rest of your program.</li>
+<li>Don't litter your control code with direct database calls. Use the API, even internally.</li>
+</ul>
+<p>Once you start to scale out, you will also want to:</p>
+<ul>
+<li>Separate the API for <em>calling</em> the database from any model (e.g. <code>FromRow</code> if you use <code>sqlx</code>) structures. You may want to reuse the model elsewhere without having to write a second layer of "data transfer objects" and spend time converting between the two.</li>
+<li>Consider making migrations a separate task. You want to be <em>really</em> careful about having multiple instances of a system changing your database!</li>
+</ul>
+<p>Let's have a look at the database layer for the <code>auth</code> system. It's quite simple, but follows a common template:</p>
+<h2 id="strongnew-typed-database-pool"><a class="header" href="#strongnew-typed-database-pool">Strong/New Typed Database Pool</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Clone)]
+pub struct AuthDb(pub sqlx::SqlitePool);
+<span class="boring">}</span></code></pre></pre>
+<p>You don't want confusion with lots of extensions all trying to include a <code>SqlitePool</code> (or similar). You can avoid this by introducing a new type that unambiguously represents your service's database resource.</p>
+<h2 id="obtain-connection-pool"><a class="header" href="#obtain-connection-pool">Obtain Connection Pool</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub async fn get_connection_pool(filename: &amp;str) -&gt; Result&lt;AuthDb&gt; {
+    let options = SqliteConnectOptions::new()
+        .filename(filename)
+        .create_if_missing(true);
+
+    let connection_pool = sqlx::SqlitePool::connect_with(options)
+        .await?;
+    Ok(AuthDb(connection_pool))
+}
+<span class="boring">}</span></code></pre></pre>
+<p>You'll typically need to call this once during service setup and share the pool as an extension layer. If you are using something other than Axum and need to have it <em>also</em> be available to other services create a static variable to share it within your module---but <em>do not</em> expose that static outside of your module.</p>
+<h2 id="perform-migrations"><a class="header" href="#perform-migrations">Perform Migrations</a></h2>
+<p>If you are using migrations, you can embed your services migrations in the binary:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub async fn perform_migrations(db_pool: AuthDb) -&gt; Result&lt;()&gt; {
+    sqlx::migrate!("src/auth/migrations")
+        .run(&amp;db_pool.0)
+        .await?;
+    Ok(())
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="api-functions"><a class="header" href="#api-functions">API functions</a></h2>
+<p>The service also includes functions to:</p>
+<ul>
+<li><code>login</code> - take a username and password, return a <code>Result&lt;Option&lt;UserId&gt;&gt;</code>.</li>
+<li><code>add_token</code> - creates a random token for a user ID.</li>
+<li><code>get_user_id_from_token</code> - checks that a token exists, and if it does returns the user ID.</li>
+<li>And the regular CRUD (Create/Read/Update/Delete): <code>get_all_users</code>, <code>get_user</code>, <code>delete_user</code>, <code>update_user</code></li>
+</ul>
+<p>There's only one "model" type: <code>User</code>.</p>
+<p>The takeaway is that the database is an API, and self-contained. You can easily scale it up: first into a directory-based module, and then into its own crate---should you need to.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="layers-and-api-systems-for-other-systems"><a class="header" href="#layers-and-api-systems-for-other-systems">Layers and API Systems for Other Systems</a></h1>
+<p>The <code>auth</code> system also includes some middleware that is used by both the <code>auth</code> service itself and by other parts of the program. This is where things get potentially sticky.</p>
+<p>The <code>auth_layers</code> module is shared with <code>pub mod</code>---it's available to the rest of the program. This presents a future scaling hazard: if you move parts of the system outside of a single monolithic service executor, but still want to use a layered approach that remains the responsibility of the <code>auth</code> system you'd want to:</p>
+<ol>
+<li>Create a separate <code>auth_client_layers</code> crate.</li>
+<li>Implement an RPC (REST, gRPC, etc.) system in that crate that <em>calls</em> the <code>auth</code> API over the network.</li>
+<li>Uses that code instead inside the layer to provide the same functionality.</li>
+</ol>
+<p>The layer injects a <code>ValidUser</code> type into recipients that request it:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Clone, Copy, Debug)]
+pub struct ValidUser(pub i32);
+<span class="boring">}</span></code></pre></pre>
+<p>The middleware itself is called <code>require_token</code>, and follows the system we discussed in Axum layers:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub async fn require_token(
+    Extension(db_pool): Extension&lt;db::AuthDb&gt;,
+    headers: HeaderMap,
+    mut req: Request,
+    next: Next,
+) -&gt; Result&lt;impl IntoResponse, (StatusCode, String)&gt; {
+    if let Some(auth_header) = headers.get("Token") {
+        let token = auth_header.to_str().map_err(|_| {
+            (
+                StatusCode::UNAUTHORIZED,
+                "invalid header".to_string(),
+            )
+        })?;
+
+        if let Some(user_id) = db::get_user_id_from_token(db_pool, token)
+            .await
+            .map_err(|_| {
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "database error".to_string(),
+                )
+            })?
+        {
+            req.extensions_mut().insert(ValidUser(user_id));
+            return Ok(next.run(req).await);
+        }
+    }
+
+    Err((StatusCode::UNAUTHORIZED, "invalid header".to_string()))
+}
+<span class="boring">}</span></code></pre></pre>
+<ol>
+<li>We intercept a Request.</li>
+<li>We read the headers.</li>
+<li>If we find the "Token" header:
+<ul>
+<li>We check that it is valid and return the user id.</li>
+</ul>
+</li>
+<li>If we didn't find the token, or it is invalid we return an error.</li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="finally-the-service-module-itself"><a class="header" href="#finally-the-service-module-itself">Finally, the service module itself</a></h1>
+<p>Now that we've looked at the parts, let's look at the <code>setup_service</code> function:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub async fn setup_service() -&gt; Result&lt;Router&gt; {
+    let config = configuration::AuthConfiguration::load()?;
+    let db_pool = db::get_connection_pool(&amp;config.db_filename).await?;
+
+    db::perform_migrations(db_pool.clone()).await?;
+
+    let secure_router = Router::new()
+        .route("/users", get(web_service::list_users))
+        .route("/users/:id", get(web_service::get_user))
+        .route("/users/delete/:id", get(web_service::delete_user))
+        .route("/users/add", post(web_service::add_user))
+        .route("/users/update/:id", post(web_service::update_user))
+        .layer(Extension(config.clone()))
+        .layer(Extension(db_pool.clone()))
+        .route_layer(middleware::from_fn(auth_layers::require_token));
+
+    let router = Router::new()
+        .route("/login", post(web_service::do_login))
+        .nest("/", secure_router)
+        .layer(Extension(config))
+        .layer(Extension(db_pool));
+
+    Ok(router)
+}
+<span class="boring">}</span></code></pre></pre>
+<p>We load our configuration, setup our database, and bind each of the services together to return a <code>Router</code>. Notice how we're using <code>require_token</code> on the secure functions---and not on the main <code>login</code> command (it would be very silly to require you to be logged in in order to gain a token).</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="combining-services-into-a-modular-monolith"><a class="header" href="#combining-services-into-a-modular-monolith">Combining Services into a Modular Monolith</a></h1>
+<p>Take a quick look at the <code>deploy_bookstore</code> project. There's a second service: <code>bookstore</code>. It follows the exact same template, and is entirely independent---other than using the <code>auth_layers</code> layer. (As I said before, that'll have to be separated if you need to de-monolith later. Be wary of adding coupling like this!)</p>
+<p>Our <code>main.rs</code> file is deliberately simple and easy to maintain. We start by including each service as a module:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>mod auth;
+mod bookstore;
+<span class="boring">}</span></code></pre></pre>
+<p>Then we include our own <code>mod service_config</code>, which follows the same template as services but defines the top-level service attributes:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ServiceConfig {
+    pub listen_address: String,
+    pub listen_port: String,
+    pub static_content: String,
+}
+<span class="boring">}</span></code></pre></pre>
+<p><code>static_content</code> defines the directory to serve as static files. You don't always have those.</p>
+<p>Finally, the <code>main</code> function initializes each service and adds them into a single webserver:</p>
+<pre><pre class="playground"><code class="language-rust">#[tokio::main]
+async fn main() -&gt; Result&lt;()&gt; {
+    tracing_subscriber::fmt::init();
+    let service_settings = service_config::ServiceConfig::load()?;
+    let auth_router = auth::setup_service().await?;
+    let books_router = bookstore::setup_service().await?;
+
+    // Listen address from configuration
+    let listen_address = format!(
+        "{}:{}",
+        service_settings.listen_address, service_settings.listen_port
+    );
+    let listener = tokio::net::TcpListener::bind(&amp;listen_address).await?;
+    tracing::info!("Listening on {}", listen_address);
+
+    // The default web server
+    let static_content = ServiceBuilder::new()
+        .layer(CorsLayer::very_permissive())
+        .service(ServeDir::new(&amp;service_settings.static_content));
+
+    // Build the master router
+    let master_router = axum::Router::new()
+        .layer(CorsLayer::very_permissive())
+        .nest("/api/v1/auth", auth_router)
+        .nest("/api/v1/books", books_router)
+        .layer(Extension(service_settings))
+        .nest_service("/", static_content);
+
+    // Launch Axum
+    axum::serve(listener, master_router).await?;
+
+    Ok(())
+}</code></pre></pre>
+<p>You may need to make this more complicated, but try not to: having a single, <em>simple</em> call site makes it easier to grow your application:</p>
+<ul>
+<li>Services are separated. You only need to call the configuration and nest/merge the <code>Router</code>.
+<ul>
+<li>If you're using <code>gRPC</code>, you can spawn that here, too.</li>
+</ul>
+</li>
+<li>Even though you have a single program, it's easy to work on as a team:
+<ul>
+<li>You can easily define responsibility areas within the program.</li>
+<li>You can easily divide services out into separate crates (and separate repos if you like), to keep teams from treading on one another.</li>
+<li>You've maintained an API approach---you aren't relying on the "innards" of each module, just what's exposed.</li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="service-exposure"><a class="header" href="#service-exposure">Service Exposure</a></h1>
+<p>You need to think about exposure on two levels:</p>
+<ul>
+<li><strong>In-code exposure</strong>. Only expose the parts of your module that you are ok with being called from outside! You don't want to discover that another team was relying on what you thought was a private function, and suddenly your implementation detail is part of the API!</li>
+<li><strong>External exposure</strong>. Not every service needs to be callable from outside. In the bookstore example, nothing is private to the outside world. If you have services that aren't available publically---don't include them in public APIs. Hide them on your local network, or require an access token that can't be generated from outside.</li>
+</ul>
+<p>Rust offers three levels of privacy:</p>
+<ul>
+<li><code>pub</code> - public. <code>pub</code> functions, fields and types are available to anyone who can access the module. Publicity is hierarchical---you can be public inside a module that isn't exposed from the outside. But be careful.</li>
+<li><code>pub(crate)</code>, which is public---but only within the same crate.</li>
+<li><code>private</code> (the default - no keyword needed). Only available inside the current module.</li>
+</ul>
+<blockquote>
+<p>A handy trick is to enable <code>![warn(missing_docs)]</code>. You'll now have warnings for every public function that doesn't have full Rust documentation provided---and none for your internal functions. That both tells you what to document, and gives a quick overview of what you've exposed to the world.</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="scaling-out"><a class="header" href="#scaling-out">Scaling Out</a></h1>
+<p>When it comes time to scale out (Rust services are fast and small, so in most cases you've got time!), there are a few areas that frequently rear their ugly heads and bite you:</p>
+<ul>
+<li>State.</li>
+<li>Latency.</li>
+<li>Accidental Coupling.</li>
+<li>Do I Really Need Microservices?</li>
+</ul>
+<h2 id="state"><a class="header" href="#state">State</a></h2>
+<p>The <code>auth</code> module wouldn't scale out well at all, as-is. All of the authentication data is stored in a single, private SQLite database. That's easy to fix: use a "real" database (or cluster), and all instances can share this as the "source of truth".</p>
+<p>You <em>can</em> safely cache valid tokens for a short amount of time to reduce API calls.</p>
+<p>It's purely a design issue: whatever shared state you are relying on <em>must</em> be available to other instances of a service, or generatable by retrying a call.</p>
+<h2 id="latency"><a class="header" href="#latency">Latency</a></h2>
+<p>Breaking your service into many smaller services can do wonders for overall throughput, but it can also hurt your latency. Every RPC call to another service takes time. Imagine you have 5 layers of services. Each of them calls <code>auth</code> to validate a token. That's 5 times the load on the <code>auth</code> service---not great. It's also five times your application has to <em>wait</em> for an external service to reply. Even on localhost, that can be a few microseconds. Async is great at maintaining throughput while things wait---but if your service is really latency sensitive, you are adding a lot of delays to the individual request.</p>
+<p>In this example, if possible you'd authenticate at the gateway---the first service. And then include a private "this guy is already authenticated" token in your subsequent request. You just shaved 5 API calls off your program at the expense of adding an internal token.</p>
+<blockquote>
+<p>Aside. I once helped a fellow who had a large service architecture. Every API call required a service locator call, and re-authenticated. It was possible to be 20 API calls deep for some operations, and performance was terrible!</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="wrap-up"><a class="header" href="#wrap-up">Wrap Up</a></h1>
+<p>Thank you for taking this class! Wrap content goes here.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>

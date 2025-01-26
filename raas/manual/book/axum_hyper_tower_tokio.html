@@ -1,0 +1,270 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Service Stack - Rust as a Service</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Rust as a Service</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="understanding-the-service-stack"><a class="header" href="#understanding-the-service-stack">Understanding the Service Stack</a></h1>
+<p>Despite being 14 lines of code (including whitespace), the <code>simple_http_server</code> example actually does quite a lot. Before we dive into expanding it, lets take a quick tour through <em>how</em> Axum is making your system function.</p>
+<p>Axum is built on a stack of different services:</p>
+<div class="table-wrapper"><table><thead><tr><th><strong>Layer</strong></th><th><strong>Purpose</strong></th></tr></thead><tbody>
+<tr><td><strong>Tokio</strong></td><td>Provides an async runtime and executor. By default it runs one thread per core, with work-stealing. It can be configured to run single-threaded, or on a limited number of threads.</td></tr>
+<tr><td><strong>Hyper</strong></td><td>Provides HTTP services, including request/response formatting and parsing. You <em>can</em> provide services with plain hyper, but by default the full stack will be invoked.</td></tr>
+<tr><td><strong>Tower</strong></td><td>Provides a middleware service layer on top of Hyper and Tokio. Tower can be used for everything from providing timeout services to authentication layers. Tower layers and extensions can be provided to Axum applications through dependency injection.</td></tr>
+</tbody></table>
+</div>
+<blockquote>
+<p>Keep this in mind as we progress. Services typically touch each layer, making use of that layer's speciality.</p>
+</blockquote>
+<h1 id="web-request-lifecycle"><a class="header" href="#web-request-lifecycle">Web Request Lifecycle</a></h1>
+<p>You open a browser (or CLI client) and go to "http://example.com/my_page". What is actually happening?</p>
+<h2 id="1-your-browser-sends-a-get-request"><a class="header" href="#1-your-browser-sends-a-get-request">1. Your Browser sends a GET request</a></h2>
+<p>Your browser opens a TCP connection to the desired endpoint. It then sends a complete request:</p>
+<pre><code>GET /axum_hyper_tower_tokio.html HTTP/1.1
+Host: localhost:3000
+User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Referer: http://localhost:3000/rest_service.html
+Connection: keep-alive
+Cookie: Rustrover-e66a9a18=970c1180-bdea-4b4b-a21e-e657e49936b3; sysauth_localhost:9000_80=0ab787d88dc1e09f564d5ccc229bf9d0; User-Token=377b8330-6625-470c-9b73-5f569b130dfa
+Upgrade-Insecure-Requests: 1
+Sec-Fetch-Dest: document
+Sec-Fetch-Mode: navigate
+Sec-Fetch-Site: same-origin
+Pragma: no-cache
+Cache-Control: no-cache
+</code></pre>
+<p>The request includes the URL you want, the host you called, encodings you'll accept, your preferred language, the previous referral page, any cookies, token headers, cache-control - a <em>lot</em> of data. If you're writing the client, you can add more headers.</p>
+<h2 id="2-the-server-receives-your-request"><a class="header" href="#2-the-server-receives-your-request">2. The Server Receives your Request</a></h2>
+<p>All of the header information is accepted by your server, and encoded. <code>Hyper</code> takes care of this. <code>Hyper</code> creates a <code>Request</code> object.</p>
+<h2 id="3-the-method-and-url-are-matched-against-a-router"><a class="header" href="#3-the-method-and-url-are-matched-against-a-router">3. The Method and URL are Matched Against a Router</a></h2>
+<p>Given <code>GET</code> and <code>/test_page</code>, Axum scans the active <code>Router</code> object to find a router that matches the request.</p>
+<h2 id="4-layers-are-invoked"><a class="header" href="#4-layers-are-invoked">4. Layers are Invoked</a></h2>
+<p>Any layers that are attached to your <code>Router</code> and operate on <code>Request</code> objects are called. They are called in turn, one at a time---passing the modified <code>Request</code> on to the next one.</p>
+<h2 id="5-handler-matching-and-dependency-injection"><a class="header" href="#5-handler-matching-and-dependency-injection">5. Handler Matching and Dependency Injection</a></h2>
+<p>Once layers are done, the <code>Request</code> is passed to the <code>Router</code>. Your handler's function signature has been built to include requests for any dependencies that are required. These are collected.</p>
+<h2 id="6-your-handler-runs"><a class="header" href="#6-your-handler-runs">6. Your Handler Runs</a></h2>
+<p>After all this, your handler finally runs! It receives any dependencies given to it by previous layers. Your Handler returns a <code>Response</code> object. <code>Hyper</code> and <code>Axum</code> collectively encode it to include not just your content but all headers that are required.</p>
+<h2 id="7-layers-are-invoked"><a class="header" href="#7-layers-are-invoked">7. Layers are Invoked</a></h2>
+<p>Any layers that operate on <code>Response</code> objects are invoked. <code>tower_http</code> provides a lot of these, for example to compress your data.</p>
+<h2 id="8-the-response-is-sent"><a class="header" href="#8-the-response-is-sent">8. The Response is Sent</a></h2>
+<p>Finally, the webserver sends your response to the client.</p>
+<p>So HTTP is deceptively simple: there's a lot going on here! The Axum/Tower/Hyper/Tokio stack gives you a great deal of control over each step.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="simple_http_server.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="axum_extractors.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="simple_http_server.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="axum_extractors.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
