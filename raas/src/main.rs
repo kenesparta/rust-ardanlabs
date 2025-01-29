@@ -1,4 +1,4 @@
-use axum::extract::Path;
+use axum::extract::{Path, State};
 use axum::extract::Query;
 use axum::http::HeaderMap;
 use axum::response::Html;
@@ -8,6 +8,7 @@ use axum::Router;
 use std::collections::HashMap;
 use std::sync::atomic::AtomicUsize;
 use std::sync::Arc;
+use axum::handler::Handler;
 
 struct Counter {
     counter: AtomicUsize,
@@ -15,6 +16,13 @@ struct Counter {
 
 struct Config {
     config_string: String,
+}
+
+struct MySate(i32);
+
+fn hello_service() -> Router {
+    let state = Arc::new(MySate(5));
+    Router::new().route("/", get(sv1_handler)).with_state(state)
 }
 
 #[tokio::main]
@@ -28,6 +36,7 @@ async fn main() {
     });
 
     let app = Router::new()
+        .nest("/hello", hello_service())
         .route("/", get(handler))
         .route("/book/{id}", get(path_extract))
         .route("/book", get(query_extractor))
@@ -39,6 +48,20 @@ async fn main() {
         .await
         .unwrap();
     axum::serve(listener, app).await.unwrap();
+}
+
+async fn sv1_handler(
+    Extension(counter): Extension<Arc<Counter>>,
+    State(state): State<Arc<MySate>>,
+) -> Html<String> {
+    counter
+        .counter
+        .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    Html(format!(
+        "<pre>My State: {} & You are the visitor number: {}</pre>",
+        state.0,
+        counter.counter.load(std::sync::atomic::Ordering::Relaxed),
+    ))
 }
 
 async fn handler(
