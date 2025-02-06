@@ -67,3 +67,68 @@ async fn main() {
     hello().await;
 }
 ```
+
+```rust
+async fn hello() -> u32 {
+    println!("hello tokio");
+    3
+}
+
+async fn hello2() -> u32 {
+    println!("hello tokio2");
+    4
+}
+
+#[tokio::main(flavor = "current_thread")]
+async fn main() {
+    hello().await;
+
+    let result = tokio::join!(hello(), hello2());
+    println!("{:?}", result);
+}
+```
+
+```rust
+async fn hello() -> u32 {
+    println!("hello tokio");
+    3
+}
+
+async fn ticker() {
+    for n in 0..50 {
+        println!("tick {}", n);
+    }
+}
+
+#[tokio::main]
+async fn main() {
+    tokio::spawn(ticker());
+    hello().await;
+}
+```
+
+Complicate it a little more
+```rust
+async fn hello() -> u32 {
+    println!("hello tokio");
+    3
+}
+
+async fn ticker() {
+    for n in 0..10 {
+        println!("tick {}", n);
+        // Go ahead to other tasks
+        tokio::task::yield_now().await;
+    }
+}
+
+#[tokio::main(flavor = "current_thread")]
+async fn main() {
+    let _ = tokio::join!(
+        tokio::spawn(hello()),
+        tokio::spawn(ticker()),
+        tokio::spawn(ticker())
+    );
+    println!("done");
+}
+```
