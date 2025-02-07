@@ -1,11 +1,10 @@
 use axum::extract::Query;
 use axum::extract::{Path, State};
-use axum::handler::Handler;
-use axum::http::HeaderMap;
-use axum::response::Html;
+use axum::http::{HeaderMap, StatusCode};
+use axum::response::{Html, IntoResponse};
 use axum::routing::get;
-use axum::Extension;
 use axum::Router;
+use axum::{Extension, Json};
 use std::collections::HashMap;
 use std::sync::atomic::AtomicUsize;
 use std::sync::Arc;
@@ -38,6 +37,7 @@ async fn main() {
     let app = Router::new()
         .nest("/hello", hello_service())
         .route("/", get(handler))
+        .route("/status", get(status))
         .route("/book/{id}", get(path_extract))
         .route("/book", get(query_extractor))
         .route("/header", get(header_extractor))
@@ -88,4 +88,20 @@ async fn query_extractor(Query(params): Query<HashMap<String, String>>) -> Html<
 
 async fn header_extractor(headers: HeaderMap) -> Html<String> {
     Html(format!("<pre>Query Parameters: {headers:#?}</pre>"))
+}
+
+async fn status() -> Result<impl IntoResponse, (StatusCode, String)> {
+    // StatusCode::IM_A_TEAPOT
+    let start = std::time::SystemTime::now();
+
+    let second_wrapped = start
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Bad Clock".to_string()))?
+        .as_secs()
+        % 3;
+
+    let divided = 100u64
+        .checked_div(second_wrapped)
+        .ok_or((StatusCode::INTERNAL_SERVER_ERROR, "div by 0".to_string()))?;
+    Ok(Json(divided))
 }
