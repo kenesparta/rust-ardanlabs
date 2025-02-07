@@ -1,5 +1,6 @@
-use axum::extract::{Path, State};
 use axum::extract::Query;
+use axum::extract::{Path, State};
+use axum::handler::Handler;
 use axum::http::HeaderMap;
 use axum::response::Html;
 use axum::routing::get;
@@ -8,7 +9,6 @@ use axum::Router;
 use std::collections::HashMap;
 use std::sync::atomic::AtomicUsize;
 use std::sync::Arc;
-use axum::handler::Handler;
 
 struct Counter {
     counter: AtomicUsize,
