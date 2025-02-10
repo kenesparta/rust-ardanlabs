@@ -8,6 +8,7 @@ use axum::{Extension, Json};
 use std::collections::HashMap;
 use std::sync::atomic::AtomicUsize;
 use std::sync::Arc;
+use tower_http::services::ServeDir;
 
 struct Counter {
     counter: AtomicUsize,
@@ -41,6 +42,7 @@ async fn main() {
         .route("/book/{id}", get(path_extract))
         .route("/book", get(query_extractor))
         .route("/header", get(header_extractor))
+        .fallback_service(ServeDir::new("web"))
         .layer(Extension(shared_counter))
         .layer(Extension(shared_text));
 
