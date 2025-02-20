@@ -207,3 +207,61 @@ mod test {
 }
 ```
 
+## Handling errors
+
+```rust
+use serde::Deserialize;
+use std::path::Path;
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+enum UserError {
+    #[error("No user found")]
+    NoUserFound,
+
+    #[error("Too many users found")]
+    TooManyUsers,
+}
+
+fn maybe_read_file() -> Result<String, std::io::Error> {
+    let my_file = Path::new("myfile.txt");
+    std::fs::read_to_string(my_file)
+}
+
+fn file_to_uppercase() -> Result<String, std::io::Error> {
+    let contents = maybe_read_file()?;
+    Ok(contents.to_ascii_uppercase())
+}
+
+#[derive(Deserialize)]
+struct User {
+    user: String,
+}
+
+// Instead of this type GenericResul we can use the anyhow crate (anyhow::Result)
+// type GenericResult<T> = Result<T, Box<dyn std::error::Error>>;
+
+fn load_user() -> Result<Vec<User>, UserError> {
+    let my_path = Path::new("myfile.txt");
+    let raw_text = std::fs::read_to_string(my_path).map_err(|_| UserError::NoUserFound)?;
+    let users: Vec<User> = serde_json::from_str(&raw_text).map_err(|_| UserError::NoUserFound)?;
+    // anyhow::bail!("We can't go on!");
+    Ok(users)
+}
+
+fn main() {
+    if let Ok(content) = file_to_uppercase() {
+        println!("Contents: {}", content);
+    }
+
+    let my_file = Path::new("myfile.txt");
+    let content = std::fs::read_to_string(my_file);
+    match content {
+        Ok(content) => println!("{}", content),
+        Err(e) => match e.kind() {
+            std::io::ErrorKind::NotFound => println!("File not found - myfile.txt"),
+            _ => println!("ERROR: {:#?}", e),
+        },
+    }
+}
+```
