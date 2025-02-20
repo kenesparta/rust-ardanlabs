@@ -1,9 +1,10 @@
-use axum::extract::Query;
 use axum::extract::{Path, State};
+use axum::extract::{Query, Request};
 use axum::http::{HeaderMap, StatusCode};
+use axum::middleware::Next;
 use axum::response::{Html, IntoResponse};
 use axum::routing::get;
-use axum::Router;
+use axum::{middleware, Router};
 use axum::{Extension, Json};
 use std::collections::HashMap;
 use std::sync::atomic::AtomicUsize;
@@ -44,7 +45,8 @@ async fn main() {
         .route("/header", get(header_extractor))
         .fallback_service(ServeDir::new("web"))
         .layer(Extension(shared_counter))
-        .layer(Extension(shared_text));
+        .layer(Extension(shared_text))
+        .route_layer(middleware::from_fn(auth));
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3003")
         .await
@@ -106,4 +108,29 @@ async fn status() -> Result<impl IntoResponse, (StatusCode, String)> {
         .checked_div(second_wrapped)
         .ok_or((StatusCode::INTERNAL_SERVER_ERROR, "div by 0".to_string()))?;
     Ok(Json(divided))
+}
+
+#[derive(Clone)]
+struct AuthHeader {
+    id: String,
+}
+
+// Middleware Auth With Injection
+// Selectively applying layers
+// Router Layers
+async fn auth(
+    headers: HeaderMap,
+    mut req: Request,
+    next: Next,
+) -> Result<impl IntoResponse, (StatusCode, String)> {
+    if let Some(header) = headers.get("x-request-id") {
+        let header = header.to_str().unwrap();
+        if header == "1234" {
+            req.extensions_mut().insert(AuthHeader {
+                id: header.to_string(),
+            });
+            return Ok(next.run(req).await);
+        }
+    }
+    Err((StatusCode::UNAUTHORIZED, "Header not valid".to_string()))
 }
