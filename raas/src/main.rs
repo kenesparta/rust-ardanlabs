@@ -10,6 +10,7 @@ use std::collections::HashMap;
 use std::sync::atomic::AtomicUsize;
 use std::sync::Arc;
 use tower_http::services::ServeDir;
+use tower_http::compression::CompressionLayer;
 
 struct Counter {
     counter: AtomicUsize,
@@ -46,6 +47,7 @@ async fn main() {
         .fallback_service(ServeDir::new("web"))
         .layer(Extension(shared_counter))
         .layer(Extension(shared_text))
+        .layer(CompressionLayer::new())
         .route_layer(middleware::from_fn(auth));
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3003")
